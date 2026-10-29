@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon --ignore data/ index.js",
+    "start": "node index.js",
+    "dev": "npx nodemon --ignore data/ index.js",
+    "build": "echo Backend ready",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
