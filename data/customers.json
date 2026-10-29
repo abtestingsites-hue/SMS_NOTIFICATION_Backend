@@ -1,0 +1,118 @@
+{
+  "customers": [
+    {
+      "id": 1767111675190,
+      "phone": "9876543210",
+      "name": "Arjun Kumar",
+      "gender": "Men",
+      "age": "28"
+    },
+    {
+      "id": 1767111675192,
+      "phone": "9876543211",
+      "name": "Priya Sharma",
+      "gender": "Women",
+      "age": "24"
+    },
+    {
+      "id": 1767111675193,
+      "phone": "9876543212",
+      "name": "Rahul Singh",
+      "gender": "Men",
+      "age": "35"
+    },
+    {
+      "id": 1767111675194,
+      "phone": "9876543213",
+      "name": "Anita Desai",
+      "gender": "Women",
+      "age": "29"
+    },
+    {
+      "id": 1767111675195,
+      "phone": "9876543214",
+      "name": "Vikram Malhotra",
+      "gender": "Men",
+      "age": "42"
+    },
+    {
+      "id": 1767111675196,
+      "phone": "9876543215",
+      "name": "Sneha Patel",
+      "gender": "Women",
+      "age": "31"
+    },
+    {
+      "id": 1767111675197,
+      "phone": "9876543216",
+      "name": "Amit Verma",
+      "gender": "Men",
+      "age": "22"
+    },
+    {
+      "id": 1767111675198,
+      "phone": "9876543217",
+      "name": "Kavita Krishnan",
+      "gender": "Women",
+      "age": "27"
+    },
+    {
+      "id": 1767111675199,
+      "phone": "9876543218",
+      "name": "Rohan Gupta",
+      "gender": "Men",
+      "age": "33"
+    },
+    {
+      "id": 1767111675200,
+      "phone": "9876543219",
+      "name": "Meera Reddy",
+      "gender": "Women",
+      "age": "26"
+    },
+    {
+      "id": 1767111675201,
+      "phone": "9876543220",
+      "name": "Suresh Iyer",
+      "gender": "Men",
+      "age": "45"
+    },
+    {
+      "id": 1767111675202,
+      "phone": "9876543221",
+      "name": "Anjali Nair",
+      "gender": "Women",
+      "age": "38"
+    },
+    {
+      "id": 1793248519837,
+      "phone": "6369825386",
+      "name": "Akash",
+      "gender": "Men"
+    },
+    {
+      "id": 1793248519838,
+      "phone": "9360068656",
+      "name": "Santhi",
+      "gender": "Men"
+    },
+    {
+      "id": 1793248519839,
+      "phone": "9363341709",
+      "name": "Harish",
+      "gender": "Men"
+    },
+    {
+      "id": 1793248519840,
+      "phone": "498634143",
+      "name": "Akashak",
+      "gender": "Men"
+    },
+    {
+      "id": 1793248519841,
+      "phone": "9080408366",
+      "name": "Bharath",
+      "gender": "Men"
+    }
+  ]
+}
