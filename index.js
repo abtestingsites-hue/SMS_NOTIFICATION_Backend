@@ -9,7 +9,7 @@ const { QueueSimulator } = require('./queueSimulator');
 const csv = require('csv-parser');
 
 const app = express();
-const PORT = process.env.PORT || https://sms-notification-frontend.onrender.com;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -20,7 +20,7 @@ const upload = multer({ dest: 'uploads/' });
 
 // Basic Routes
 app.get('/', (req, res) => {
-    res.send('Backend is running! 🚀 <br> Please access the frontend at <a href="http://localhost:5173">http://localhost:5173</a>');
+    res.send('Backend is running! 🚀 <br> Please access the frontend at <a href="https://sms-notification-frontend.onrender.com">https://sms-notification-frontend.onrender.com</a>');
 });
 
 app.get('/api/health', (req, res) => {
