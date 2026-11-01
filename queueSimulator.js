@@ -1,5 +1,6 @@
 const { DataManager } = require('./dataManager');
 const twilio = require('twilio');
+const dispatchTelemetryService = require('./services/dispatchTelemetryService');
 
 class QueueSimulator {
     constructor() {
@@ -167,6 +168,33 @@ class QueueSimulator {
         }
 
         const success = results.whatsapp.sent || results.sms.sent;
+
+        // Record discrete channel dispatches into verified telemetry ledger
+        try {
+            if (results.whatsapp.attempted) {
+                await dispatchTelemetryService.recordDispatch({
+                    channel: 'whatsapp',
+                    recipient: rawPhone,
+                    sid: results.whatsapp.sid,
+                    status: results.whatsapp.sent ? 'sent' : 'failed',
+                    errorCode: results.whatsapp.code,
+                    errorMessage: results.whatsapp.error
+                });
+            }
+            if (results.sms.attempted) {
+                await dispatchTelemetryService.recordDispatch({
+                    channel: 'sms',
+                    recipient: rawPhone,
+                    sid: results.sms.sid,
+                    status: results.sms.sent ? 'sent' : 'failed',
+                    errorCode: results.sms.code,
+                    errorMessage: results.sms.error
+                });
+            }
+        } catch (e) {
+            console.warn('[Telemetry Recording Warning]', e.message);
+        }
+
         return {
             success,
             whatsapp: results.whatsapp,
@@ -360,6 +388,23 @@ class QueueSimulator {
 
                 await DataManager.updateCampaign(campaign.id, { status: 'COMPLETED' });
                 console.log(`[Scheduler] Campaign ${campaign.id} completed. Total sent: ${sentCount}`);
+                try {
+                    const notificationService = require('./services/notificationService');
+                    await notificationService.createNotification({
+                        userId: 'admin',
+                        type: 'success',
+                        category: 'CAMPAIGN',
+                        title: 'Broadcast Campaign Completed',
+                        message: `Campaign "${campaign.name || campaign.id}" completed. Dispatched to ${sentCount} recipient(s).`,
+                        relatedEntityType: 'campaign',
+                        relatedEntityId: campaign.id,
+                        actionUrl: 'campaigns',
+                        idempotencyKey: `campaign_completed_${campaign.id}`,
+                        metadata: { campaignId: campaign.id, sentCount }
+                    });
+                } catch (e) {
+                    console.warn('[QueueSimulator] Notification emission error:', e.message);
+                }
             }
         } catch (error) {
             console.error('[Scheduler] Error in loop:', error);

@@ -8,24 +8,79 @@ const { DataManager } = require('./dataManager');
 const { QueueSimulator } = require('./queueSimulator');
 const csv = require('csv-parser');
 
+// Expansion Services
+const integrationService = require('./services/integrationService');
+const mediaService = require('./services/mediaService');
+const schedulerService = require('./services/schedulerService');
+const automationService = require('./services/automationService');
+const governanceService = require('./services/governanceService');
+const metaCampaignService = require('./services/metaCampaignService');
+const googleCampaignService = require('./services/googleCampaignService');
+const inboundWebhookService = require('./services/inboundWebhookService');
+const storageProvider = require('./services/storageProvider');
+const notificationService = require('./services/notificationService');
+const dispatchTelemetryService = require('./services/dispatchTelemetryService');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Ensure upload directories exist
+const MEDIA_UPLOAD_DIR = path.join(__dirname, 'uploads', 'media');
+if (!fs.existsSync(MEDIA_UPLOAD_DIR)) {
+    fs.mkdirSync(MEDIA_UPLOAD_DIR, { recursive: true });
+}
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Upload config
+// Static Media Hosting
+app.use('/uploads/media', express.static(MEDIA_UPLOAD_DIR));
+
+// Basic Upload Config for CSVs
 const upload = multer({ dest: 'uploads/' });
+
+// Media Library Multer Storage Engine
+const mediaStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, MEDIA_UPLOAD_DIR);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, 'asset-' + uniqueSuffix + ext);
+    }
+});
+
+const mediaUpload = multer({
+    storage: mediaStorage,
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+            'video/mp4', 'application/pdf'
+        ];
+        if (allowedTypes.includes(file.mimetype.toLowerCase())) {
+            cb(null, true);
+        } else {
+            cb(new Error(`Unsupported file type: ${file.mimetype}. Allowed: JPG, PNG, WebP, MP4, PDF`));
+        }
+    }
+});
 
 // Basic Routes
 app.get('/', (req, res) => {
-    res.send('Backend is running! 🚀 <br> Please access the frontend at <a href="https://sms-notification-frontend.onrender.com">https://sms-notification-frontend.onrender.com</a>');
+    res.send('Backend is running! 🚀 <br> Multi-Channel Marketing Automation Platform');
 });
 
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', mode: 'demo' });
+    res.json({ status: 'ok', mode: 'enterprise_production' });
 });
+
+// =========================================================================
+// 1. EXISTING DATA & CAMPAIGN ROUTES (PRESERVED IN FULL)
+// =========================================================================
 
 // Upload Customers CSV
 app.post('/api/upload/customers', upload.single('file'), (req, res) => {
@@ -48,6 +103,16 @@ app.post('/api/upload/customers', upload.single('file'), (req, res) => {
             fs.unlinkSync(req.file.path);
             res.json({ message: 'Customers uploaded', count: customers.length });
         });
+});
+
+// Get Customers List & Registry Analytics
+app.get('/api/customers', async (req, res) => {
+    try {
+        const customers = await DataManager.getCustomers();
+        res.json(customers);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Upload Offers CSV
@@ -187,6 +252,12 @@ app.post('/api/sms/send-single', async (req, res) => {
     try {
         const { recipient, platform = 'both', template, recipientName = 'Akash', offerCode } = req.body;
         const targetNumber = recipient || process.env.CUSTOMER_CARE_NUMBER || '+919363341709';
+
+        // Customer governance check
+        const governance = await governanceService.validateDispatch({ phone: targetNumber });
+        if (!governance.allowed) {
+            return res.status(403).json({ success: false, error: governance.reason });
+        }
 
         const offers = await DataManager.getOffers();
         let selectedOffer = offers.length > 0 ? offers[0] : { code: 'SUMMER25', discount: '25% OFF', description: 'Summer Collection Special' };
@@ -338,6 +409,17 @@ app.post('/api/campaigns/start', async (req, res) => {
     });
 });
 
+// Get All Campaigns (Historical & Active)
+app.get('/api/campaigns', async (req, res) => {
+    try {
+        const db = await DataManager._getMainDB();
+        const campaigns = db.campaigns || [];
+        res.json(campaigns);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Get Campaign Status
 app.get('/api/campaigns/:id', async (req, res) => {
     const campaign = await DataManager.getCampaign(parseInt(req.params.id));
@@ -358,10 +440,535 @@ app.post('/api/template', async (req, res) => {
     res.json({ message: 'Template saved', template });
 });
 
-// Start Server with Port Fallback
+
+// =========================================================================
+// 2. MEDIA LIBRARY ROUTES
+// =========================================================================
+
+app.get('/api/media', async (req, res) => {
+    try {
+        const media = await mediaService.getAll(req.query);
+        res.json(media);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/media/upload', mediaUpload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No media file provided' });
+        const record = await mediaService.registerUpload(req.file, {
+            caption: req.body.caption,
+            tags: req.body.tags
+        });
+        res.status(201).json({ message: 'Media uploaded successfully', asset: record });
+    } catch (err) {
+        console.error('Media upload error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/media/asset/:id', async (req, res) => {
+    try {
+        const asset = await mediaService.getById(req.params.id);
+        if (!asset) return res.status(404).json({ error: 'Asset not found' });
+        const filePath = storageProvider.getAssetPath(asset.filename);
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'Asset file not found on disk' });
+        }
+        res.setHeader('Content-Type', asset.mimeType || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+        res.sendFile(filePath);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/media/:id', async (req, res) => {
+    try {
+        const updated = await mediaService.update(req.params.id, req.body);
+        res.json({ message: 'Media asset updated', asset: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.delete('/api/media/:id', async (req, res) => {
+    try {
+        const force = req.query.force === 'true';
+        const result = await mediaService.delete(req.params.id, { force });
+        if (!result.success && result.referenced) {
+            return res.status(409).json(result);
+        }
+        res.json({ message: 'Asset deleted successfully' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 3. INTEGRATION CONSOLE & VAULT ROUTES
+// =========================================================================
+
+app.get('/api/integrations/status', async (req, res) => {
+    try {
+        const status = await integrationService.getPublicStatus();
+        res.json(status);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/integrations/:provider/save', async (req, res) => {
+    try {
+        const provider = req.params.provider.toLowerCase();
+        const result = await integrationService.saveCredentials(provider, req.body);
+        res.json({ message: `${provider} credentials saved and verified`, result });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/integrations/:provider/verify', async (req, res) => {
+    try {
+        const provider = req.params.provider.toLowerCase();
+        const result = await integrationService.verifyProvider(provider);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/integrations/:provider/disconnect', async (req, res) => {
+    try {
+        const provider = req.params.provider.toLowerCase();
+        const result = await integrationService.disconnectProvider(provider);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 4. MESSAGE SCHEDULER ROUTES
+// =========================================================================
+
+app.get('/api/schedules', async (req, res) => {
+    try {
+        const list = await schedulerService.getAll();
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/schedules', async (req, res) => {
+    try {
+        const item = await schedulerService.createSchedule(req.body);
+        res.status(201).json({ message: 'Schedule created', schedule: item });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/schedules/:id', async (req, res) => {
+    try {
+        const updated = await schedulerService.updateSchedule(req.params.id, req.body);
+        res.json({ message: 'Schedule updated', schedule: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.delete('/api/schedules/:id', async (req, res) => {
+    try {
+        await schedulerService.deleteSchedule(req.params.id);
+        res.json({ message: 'Schedule deleted' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/schedules/:id/run-now', async (req, res) => {
+    try {
+        const result = await schedulerService.executeSchedule(req.params.id, { DataManager, QueueSimulator });
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/schedules/:id/cancel', async (req, res) => {
+    try {
+        const result = await schedulerService.cancelSchedule(req.params.id);
+        res.json({ message: 'Schedule cancelled', schedule: result });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 5. FOLLOW-UP AUTOMATION WORKFLOW ROUTES
+// =========================================================================
+
+app.get('/api/automations', async (req, res) => {
+    try {
+        const list = await automationService.getAll();
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/automations', async (req, res) => {
+    try {
+        const created = await automationService.createAutomation(req.body);
+        res.status(201).json({ message: 'Automation workflow created', automation: created });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/automations/:id', async (req, res) => {
+    try {
+        const updated = await automationService.updateAutomation(req.params.id, req.body);
+        res.json({ message: 'Workflow updated', automation: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/automations/:id/toggle', async (req, res) => {
+    try {
+        const result = await automationService.toggleActive(req.params.id);
+        res.json({ message: `Workflow is now ${result.active ? 'Active' : 'Paused'}`, automation: result });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.delete('/api/automations/:id', async (req, res) => {
+    try {
+        await automationService.deleteAutomation(req.params.id);
+        res.json({ message: 'Automation workflow deleted' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/automations/:id/trigger-test', async (req, res) => {
+    try {
+        const result = await automationService.triggerTest(req.params.id, req.body.customer);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 6. META MARKETING CAMPAIGN ROUTES
+// =========================================================================
+
+app.get('/api/meta/campaigns', async (req, res) => {
+    try {
+        const data = await metaCampaignService.getStatusAndCampaigns();
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/meta/campaigns', async (req, res) => {
+    try {
+        const created = await metaCampaignService.createCampaign(req.body);
+        res.status(201).json({ message: 'Meta campaign created', campaign: created });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/meta/campaigns/:id/toggle', async (req, res) => {
+    try {
+        const updated = await metaCampaignService.toggleCampaignStatus(req.params.id);
+        res.json({ message: 'Campaign status updated', campaign: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.put('/api/meta/campaigns/:id/budget', async (req, res) => {
+    try {
+        const updated = await metaCampaignService.updateBudget(req.params.id, req.body.dailyBudget);
+        res.json({ message: 'Budget updated', campaign: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 7. GOOGLE ADS CAMPAIGN ROUTES
+// =========================================================================
+
+app.get('/api/google/campaigns', async (req, res) => {
+    try {
+        const data = await googleCampaignService.getStatusAndCampaigns();
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/google/campaigns', async (req, res) => {
+    try {
+        const created = await googleCampaignService.createCampaign(req.body);
+        res.status(201).json({ message: 'Google Ads campaign created', campaign: created });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/google/campaigns/:id/toggle', async (req, res) => {
+    try {
+        const updated = await googleCampaignService.toggleCampaignStatus(req.params.id);
+        res.json({ message: 'Campaign status updated', campaign: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.put('/api/google/campaigns/:id/budget', async (req, res) => {
+    try {
+        const updated = await googleCampaignService.updateBudget(req.params.id, req.body.dailyBudget);
+        res.json({ message: 'Budget updated', campaign: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 8. CUSTOMER SAFETY & GOVERNANCE ROUTES
+// =========================================================================
+
+app.get('/api/governance/suppression', async (req, res) => {
+    try {
+        const list = await governanceService.getSuppressionList();
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/governance/suppression/add', async (req, res) => {
+    try {
+        const { phone, reason, source } = req.body;
+        if (!phone) return res.status(400).json({ error: 'Phone number required' });
+        const result = await governanceService.suppressPhone(phone, reason, source);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/governance/suppression/remove', async (req, res) => {
+    try {
+        const { phone } = req.body;
+        if (!phone) return res.status(400).json({ error: 'Phone number required' });
+        const result = await governanceService.unsuppressPhone(phone);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/governance/rules', async (req, res) => {
+    try {
+        const rules = await governanceService.getRules();
+        res.json(rules);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/governance/rules', async (req, res) => {
+    try {
+        const updated = await governanceService.updateRules(req.body);
+        res.json({ message: 'Governance rules saved', rules: updated });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 9. TWILIO INBOUND WEBHOOK & ENGAGEMENT ROUTES
+// =========================================================================
+
+app.post('/api/webhooks/twilio/inbound', async (req, res) => {
+    try {
+        // 1. Signature validation in production
+        const sigCheck = await inboundWebhookService.validateWebhookSignature(req);
+        if (!sigCheck.valid) {
+            console.warn(`[Webhook Rejected] Signature validation failure: ${sigCheck.reason}`);
+            return res.status(403).type('text/xml').send('<Response><Message>Forbidden</Message></Response>');
+        }
+
+        // 2. Process inbound message (idempotency, customer resolution, opt-out, cancel follow-ups)
+        const result = await inboundWebhookService.processInboundMessage(req.body);
+
+        // 3. Return valid TwiML
+        res.type('text/xml').send('<Response></Response>');
+    } catch (err) {
+        console.error('[Webhook Error]', err);
+        res.status(500).type('text/xml').send(`<Response><!-- ${err.message} --></Response>`);
+    }
+});
+
+app.get('/api/webhooks/twilio/messages', async (req, res) => {
+    try {
+        const messages = await inboundWebhookService.getInboundMessages(req.query);
+        res.json({ count: messages.length, messages });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Twilio Message Delivery Status Callback (Handset Receipts & Error Tracking)
+app.post('/api/webhooks/twilio/status', async (req, res) => {
+    try {
+        const messageSid = req.body.MessageSid || req.body.SmsSid;
+        const messageStatus = req.body.MessageStatus || req.body.SmsStatus;
+        const errorCode = req.body.ErrorCode || null;
+        const errorMessage = req.body.ErrorMessage || null;
+
+        if (!messageSid || !messageStatus) {
+            return res.status(400).json({ error: 'Missing MessageSid or MessageStatus' });
+        }
+
+        const result = await dispatchTelemetryService.processStatusCallback({
+            messageSid,
+            messageStatus,
+            errorCode,
+            errorMessage,
+            rawPayload: req.body
+        });
+
+        res.json(result);
+    } catch (err) {
+        console.error('[Status Callback Error]', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Analytics Telemetry Endpoint (Discrete Channel Performance & Verified Rates)
+app.get('/api/analytics/telemetry', async (req, res) => {
+    try {
+        const { dateRange = 'all', granularity = 'daily', timeZone = 'UTC' } = req.query;
+        const metrics = await dispatchTelemetryService.getTelemetryMetrics({ dateRange, granularity, timeZone });
+        res.json(metrics);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// 10. NOTIFICATIONS ROUTES (PHASE 15 ADDENDUM)
+// =========================================================================
+
+app.get('/api/notifications', async (req, res) => {
+    try {
+        const userId = req.query.userId || 'admin';
+        const unreadOnly = req.query.unreadOnly === 'true';
+        const limit = parseInt(req.query.limit, 10) || 50;
+        const list = await notificationService.getAll({ userId, unreadOnly, limit });
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/notifications/unread-count', async (req, res) => {
+    try {
+        const userId = req.query.userId || 'admin';
+        const unreadCount = await notificationService.getUnreadCount({ userId });
+        res.json({ unreadCount });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/notifications', async (req, res) => {
+    try {
+        const notif = await notificationService.createNotification(req.body);
+        res.status(201).json(notif);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/notifications/:id/read', async (req, res) => {
+    try {
+        const userId = (req.body && req.body.userId) || 'admin';
+        const result = await notificationService.markRead(req.params.id, userId);
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/notifications/mark-all-read', async (req, res) => {
+    try {
+        const userId = (req.body && req.body.userId) || 'admin';
+        const result = await notificationService.markAllRead(userId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+    try {
+        const userId = req.query.userId || 'admin';
+        const result = await notificationService.deleteNotification(req.params.id, userId);
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/notifications', async (req, res) => {
+    try {
+        const userId = req.query.userId || 'admin';
+        const result = await notificationService.clearAll(userId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =========================================================================
+// BACKGROUND RUNNER INITIATION & SERVER START
+// =========================================================================
+
+// Start scheduler background runner
+schedulerService.startRunner({ DataManager, QueueSimulator });
+
 const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Backend Server running on http://localhost:${PORT}`);
-    console.log(`Resources: /api/upload/customers, /api/upload/offers, /api/template, /api/settings, /api/customer-care/test, /api/sms/send-single`);
+    console.log(`✅ Multi-Channel Backend running on http://localhost:${PORT}`);
+    console.log(`📡 Endpoints initialized for Media, Schedules, Automations, Meta, Google, Integrations & Governance`);
 });
 
 server.on('error', (e) => {

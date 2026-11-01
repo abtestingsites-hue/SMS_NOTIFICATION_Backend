@@ -135,8 +135,26 @@ class DataManager {
     async addOffers(newOffers) {
         const db = await this._getMainDB();
         if (!db.offers) db.offers = [];
-        db.offers.push(...newOffers);
-        await this._saveMainDB(db);
+
+        const existingCodes = new Set(db.offers.map(o => o.code).filter(Boolean));
+        const unique = [];
+
+        for (const o of newOffers) {
+            const code = o.code ? String(o.code).trim().toUpperCase() : null;
+            if (code && !existingCodes.has(code)) {
+                existingCodes.add(code);
+                unique.push({
+                    ...o,
+                    code,
+                    id: o.id || (Date.now() + Math.floor(Math.random() * 1000))
+                });
+            }
+        }
+
+        if (unique.length > 0) {
+            db.offers.push(...unique);
+            await this._saveMainDB(db);
+        }
         return db.offers.length;
     }
 
