@@ -11,7 +11,7 @@ const assert = require('assert');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = process.env.API_BASE || 'http://localhost:5000';
 
 async function runTestSuite() {
     console.log('================================================================');
