@@ -13,6 +13,7 @@ class CampaignBuilderService {
     constructor() {
         this.lock = Promise.resolve();
         this.initialized = false;
+        this.launchLocks = new Map();
     }
 
     async init() {
@@ -37,7 +38,14 @@ class CampaignBuilderService {
 
     async _writeDrafts(drafts) {
         await (this.lock = this.lock.then(async () => {
-            await fs.writeFile(DRAFTS_FILE, JSON.stringify(drafts, null, 2), 'utf8');
+            const tempFile = `${DRAFTS_FILE}.tmp.${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+            await fs.writeFile(tempFile, JSON.stringify(drafts, null, 2), 'utf8');
+            try {
+                await fs.rename(tempFile, DRAFTS_FILE);
+            } catch (err) {
+                await fs.writeFile(DRAFTS_FILE, JSON.stringify(drafts, null, 2), 'utf8');
+                await fs.unlink(tempFile).catch(() => {});
+            }
         }));
     }
 
@@ -177,6 +185,24 @@ class CampaignBuilderService {
 
     // --- Launch / Schedule Visual Campaign ---
     async launchCampaign(payload) {
+        // Debounce & Idempotency Check
+        const idempotencyKey = payload.idempotencyKey || `${payload.name || 'camp'}_${payload.channel || 'both'}_${payload.audienceSelection?.segmentName || 'All'}_${payload.template?.length || 0}`;
+        const nowMs = Date.now();
+        if (this.launchLocks && this.launchLocks.has(idempotencyKey)) {
+            const lastLaunch = this.launchLocks.get(idempotencyKey);
+            if (nowMs - lastLaunch < 5000) {
+                console.warn(`[Campaign Builder] Duplicate launch rejected: ${idempotencyKey}`);
+                throw new Error('Duplicate launch request detected within 5-second debounce window. Please wait before re-launching.');
+            }
+        }
+        if (this.launchLocks) {
+            this.launchLocks.set(idempotencyKey, nowMs);
+            if (this.launchLocks.size > 200) {
+                for (const [k, v] of this.launchLocks.entries()) {
+                    if (nowMs - v > 60000) this.launchLocks.delete(k);
+                }
+            }
+        }
         const {
             name = 'Visual Campaign',
             channel = 'both',
@@ -235,7 +261,7 @@ class CampaignBuilderService {
         }
 
         // 5. Schedule Determination
-        const isScheduled = scheduleConfig.mode === 'SCHEDULED' && scheduleConfig.scheduledDate;
+        const isScheduled = Boolean(scheduleConfig.mode === 'SCHEDULED' && scheduleConfig.scheduledDate);
         let scheduledForDate = new Date();
         if (isScheduled) {
             const dtString = `${scheduleConfig.scheduledDate}T${scheduleConfig.scheduledTime || '10:00:00'}`;
@@ -301,7 +327,19 @@ class CampaignBuilderService {
                 const variants = languageConfig.languageVariants || {};
                 const defLang = (languageConfig.defaultLanguage || 'tamil').toLowerCase();
 
+                let dispatchedCount = 0;
+                let suppressedSkipped = 0;
+
                 for (const recipient of recipients) {
+                    // Pre-dispatch real-time opt-out / suppression check
+                    const cleanPhone = String(recipient.phone || '').trim().replace(/^\+/, '');
+                    const isSuppressed = await governanceService.isSuppressed(cleanPhone);
+                    if (isSuppressed) {
+                        suppressedSkipped++;
+                        console.log(`[Builder Dispatch] Recipient ${cleanPhone} is suppressed / opted out. Skipping.`);
+                        continue;
+                    }
+
                     const custLang = (recipient.language || defLang).toLowerCase();
                     const languageMessage = variants[custLang] || variants[defLang] || resolvedTemplate;
 
@@ -338,6 +376,84 @@ class CampaignBuilderService {
                 scheduledFor: scheduledForDate.toISOString(),
                 languagesMapped: Object.keys(audienceSummary.languageBreakdown)
             }
+        };
+    }
+    // --- Strict Delivery Reconciliation & Campaign Analytics ---
+    async getCampaignAnalytics(campaignId) {
+        const idStr = String(campaignId);
+        const db = await DataManager._getMainDB();
+        const campaign = (db.campaigns || []).find(c => String(c.id) === idStr);
+        if (!campaign) {
+            throw new Error(`Campaign ${campaignId} not found`);
+        }
+
+        const dispatches = await dispatchTelemetryService.getDispatchesByCampaign(idStr);
+        const attempted = dispatches.length;
+        const sent = dispatches.filter(d => ['sent', 'delivered'].includes(d.status)).length;
+        const delivered = dispatches.filter(d => d.status === 'delivered').length;
+        const failed = dispatches.filter(d => ['failed', 'undelivered'].includes(d.status)).length;
+        const pending = dispatches.filter(d => ['queued', 'accepted', 'pending', 'sending'].includes(d.status)).length;
+
+        const smsDispatches = dispatches.filter(d => d.channel === 'sms');
+        const waDispatches = dispatches.filter(d => d.channel === 'whatsapp');
+
+        const smsMetrics = {
+            attempted: smsDispatches.length,
+            sent: smsDispatches.filter(d => ['sent', 'delivered'].includes(d.status)).length,
+            delivered: smsDispatches.filter(d => d.status === 'delivered').length,
+            failed: smsDispatches.filter(d => ['failed', 'undelivered'].includes(d.status)).length
+        };
+
+        const waMetrics = {
+            attempted: waDispatches.length,
+            sent: waDispatches.filter(d => ['sent', 'delivered'].includes(d.status)).length,
+            delivered: waDispatches.filter(d => d.status === 'delivered').length,
+            failed: waDispatches.filter(d => ['failed', 'undelivered'].includes(d.status)).length
+        };
+
+        // Strict carrier delivery receipt formula: delivered / (delivered + failed)
+        const receiptTotal = delivered + failed;
+        const deliveryRate = receiptTotal > 0 ? Number(((delivered / receiptTotal) * 100).toFixed(2)) : (sent > 0 ? 100 : 0);
+
+        const languageBreakdown = {};
+        dispatches.forEach(d => {
+            const lang = d.metadata?.language || 'default';
+            languageBreakdown[lang] = (languageBreakdown[lang] || 0) + 1;
+        });
+
+        // Media click tracking for this campaign
+        const mediaClicks = await dispatchTelemetryService.getMediaClicks(campaign.mediaId);
+        const campaignClicks = mediaClicks.filter(c => !c.campaignId || String(c.campaignId) === idStr);
+
+        // Opt-out tracking
+        const suppressionList = await governanceService.getSuppressionList();
+        const campaignOptOuts = suppressionList.filter(s => s.reason?.includes(idStr) || s.metadata?.campaignId === idStr).length;
+
+        return {
+            campaignId: campaign.id,
+            campaignName: campaign.name,
+            status: campaign.status,
+            platform: campaign.platform,
+            totalRecipients: campaign.total || dispatches.length,
+            eligibleCount: campaign.total || dispatches.length,
+            attemptedCount: attempted,
+            sentCount: sent,
+            deliveredCount: delivered,
+            failedCount: failed,
+            pendingCount: pending,
+            deliveryRatePercentage: deliveryRate,
+            smsVsWhatsapp: {
+                sms: smsMetrics,
+                whatsapp: waMetrics
+            },
+            languageBreakdown: Object.keys(languageBreakdown).length > 0 ? languageBreakdown : { tamil: campaign.total || 0 },
+            conversionMetrics: {
+                mediaClicksCount: campaignClicks.length,
+                clickThroughRate: attempted > 0 ? Number(((campaignClicks.length / attempted) * 100).toFixed(2)) : 0,
+                optOutCount: campaignOptOuts,
+                optOutRate: attempted > 0 ? Number(((campaignOptOuts / attempted) * 100).toFixed(2)) : 0
+            },
+            verifiedAt: new Date().toISOString()
         };
     }
 }

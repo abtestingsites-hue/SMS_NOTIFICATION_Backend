@@ -656,6 +656,320 @@
       },
       "geminiExtraction": null,
       "builderIntegrated": true
+    },
+    {
+      "id": 1793549847909,
+      "name": "Test Bulk Dispatch Phase 18",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T16:17:27.909Z",
+      "scheduledFor": "2026-11-01T16:17:27.909Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Special Festive Offer\n\nReply STOP to opt out.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [
+        {
+          "id": "b1",
+          "type": "headline",
+          "label": "Headline",
+          "content": "Special Festive Offer",
+          "order": 1
+        },
+        {
+          "id": "b2",
+          "type": "optout",
+          "label": "Opt-out",
+          "content": "Reply STOP to opt out.",
+          "order": 2
+        }
+      ],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558214526,
+      "name": "Audit Multilingual Festival Promo",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:36:54.527Z",
+      "scheduledFor": "2026-11-01T18:36:54.526Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil",
+          "telugu",
+          "kannada",
+          "malayalam",
+          "hindi",
+          "marathi"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {
+          "tamil": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+          "telugu": "నమస్కారం {{customer_name}}, సత్య ప్రత్యేక ఆఫర్! కోడ్: SUMMER25 ఉపయోగించండి.",
+          "kannada": "ನಮಸ್ಕಾರ {{customer_name}}, ಸತ್ಯ ವಿಶೇಷ ರಿಯಾಯಿತಿ! ಕೋಡ್: SUMMER25 ಬಳಸಿ.",
+          "malayalam": "നമസ്കാരം {{customer_name}}, സത്യ സ്പെഷ്യൽ ഓഫർ! കോഡ്: SUMMER25 ഉപയോഗിക്കുക.",
+          "hindi": "नमस्ते {{customer_name}}, सत्या का विशेष ऑफर! कोड SUMMER25 का उपयोग करें।",
+          "marathi": "नमस्कार {{customer_name}}, सत्याची विशेष ऑफर! कोड: SUMMER25 वापरा."
+        }
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558214539,
+      "name": "Audit Scheduled Broadcast",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:36:54.539Z",
+      "scheduledFor": "2026-11-03T10:00:00.000Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{customer_name}}, scheduled event invitation.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "SCHEDULED",
+        "scheduledDate": "2026-11-03",
+        "scheduledTime": "15:30:00",
+        "timezone": "Asia/Kolkata"
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558293099,
+      "name": "Audit Multilingual Festival Promo",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:38:13.099Z",
+      "scheduledFor": "2026-11-01T18:38:13.099Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil",
+          "telugu",
+          "kannada",
+          "malayalam",
+          "hindi",
+          "marathi"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {
+          "tamil": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+          "telugu": "నమస్కారం {{customer_name}}, సత్య ప్రత్యేక ఆఫర్! కోడ్: SUMMER25 ఉపయోగించండి.",
+          "kannada": "ನಮಸ್ಕಾರ {{customer_name}}, ಸತ್ಯ ವಿಶೇಷ ರಿಯಾಯಿತಿ! ಕೋಡ್: SUMMER25 ಬಳಸಿ.",
+          "malayalam": "നമസ്കാരം {{customer_name}}, സത്യ സ്പെഷ്യൽ ഓഫർ! കോഡ്: SUMMER25 ഉപയോഗിക്കുക.",
+          "hindi": "नमस्ते {{customer_name}}, सत्या का विशेष ऑफर! कोड SUMMER25 का उपयोग करें।",
+          "marathi": "नमस्कार {{customer_name}}, सत्याची विशेष ऑफर! कोड: SUMMER25 वापरा."
+        }
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558293123,
+      "name": "Audit Scheduled Broadcast",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:38:13.123Z",
+      "scheduledFor": "2026-11-03T10:00:00.000Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{customer_name}}, scheduled event invitation.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "SCHEDULED",
+        "scheduledDate": "2026-11-03",
+        "scheduledTime": "15:30:00",
+        "timezone": "Asia/Kolkata"
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558351283,
+      "name": "Audit Multilingual Festival Promo",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:39:11.283Z",
+      "scheduledFor": "2026-11-01T18:39:11.283Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil",
+          "telugu",
+          "kannada",
+          "malayalam",
+          "hindi",
+          "marathi"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {
+          "tamil": "வணக்கம் {{customer_name}}, சத்யா வழங்கும் சிறப்பு சலுகை! குறியீடு: SUMMER25.",
+          "telugu": "నమస్కారం {{customer_name}}, సత్య ప్రత్యేక ఆఫర్! కోడ్: SUMMER25 ఉపయోగించండి.",
+          "kannada": "ನಮಸ್ಕಾರ {{customer_name}}, ಸತ್ಯ ವಿಶೇಷ ರಿಯಾಯಿತಿ! ಕೋಡ್: SUMMER25 ಬಳಸಿ.",
+          "malayalam": "നമസ്കാരം {{customer_name}}, സത്യ സ്പെഷ്യൽ ഓഫർ! കോഡ്: SUMMER25 ഉപയോഗിക്കുക.",
+          "hindi": "नमस्ते {{customer_name}}, सत्या का विशेष ऑफर! कोड SUMMER25 का उपयोग करें।",
+          "marathi": "नमस्कार {{customer_name}}, सत्याची विशेष ऑफर! कोड: SUMMER25 वापरा."
+        }
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793558351310,
+      "name": "Audit Scheduled Broadcast",
+      "status": "SCHEDULED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T18:39:11.310Z",
+      "scheduledFor": "2026-11-03T10:00:00.000Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{customer_name}}, scheduled event invitation.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "SCHEDULED",
+        "scheduledDate": "2026-11-03",
+        "scheduledTime": "15:30:00",
+        "timezone": "Asia/Kolkata"
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
     }
   ],
   "offers": [

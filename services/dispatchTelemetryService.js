@@ -195,6 +195,13 @@ class DispatchTelemetryService {
         }));
     }
 
+    async getDispatchesByCampaign(campaignId) {
+        await this.init();
+        const dispatches = await this._readDispatches();
+        if (!campaignId) return dispatches;
+        return dispatches.filter(d => String(d.campaignId) === String(campaignId));
+    }
+
     normalizeStatus(status) {
         if (!status) return 'unknown';
         const s = String(status).toLowerCase().trim();

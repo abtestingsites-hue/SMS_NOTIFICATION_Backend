@@ -1,6 +1,78 @@
 {
   "schedules": [
     {
+      "id": "sch_1793558351315_evn7",
+      "name": "[Builder] Audit Scheduled Broadcast",
+      "type": "ONCE",
+      "scheduledAt": "2026-11-03T10:00:00.000Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{customer_name}}, scheduled event invitation.",
+      "offerCode": "SUMMER25",
+      "mediaId": null,
+      "idempotencyKey": "idemp_7a4e78a05a882f7eafcb6350",
+      "status": "SCHEDULED",
+      "createdAt": "2026-11-01T18:39:11.315Z",
+      "lastRunAt": null,
+      "executionCount": 0,
+      "logs": [
+        {
+          "timestamp": "2026-11-01T18:39:11.315Z",
+          "event": "SCHEDULED",
+          "details": "Scheduled for 2026-11-03T10:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "sch_1793558293126_y1x8",
+      "name": "[Builder] Audit Scheduled Broadcast",
+      "type": "ONCE",
+      "scheduledAt": "2026-11-03T10:00:00.000Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{customer_name}}, scheduled event invitation.",
+      "offerCode": "SUMMER25",
+      "mediaId": null,
+      "idempotencyKey": "idemp_142d7fe12284767d4cdf86be",
+      "status": "SCHEDULED",
+      "createdAt": "2026-11-01T18:38:13.126Z",
+      "lastRunAt": null,
+      "executionCount": 0,
+      "logs": [
+        {
+          "timestamp": "2026-11-01T18:38:13.126Z",
+          "event": "SCHEDULED",
+          "details": "Scheduled for 2026-11-03T10:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "sch_1793558214543_phn5",
+      "name": "[Builder] Audit Scheduled Broadcast",
+      "type": "ONCE",
+      "scheduledAt": "2026-11-03T10:00:00.000Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{customer_name}}, scheduled event invitation.",
+      "offerCode": "SUMMER25",
+      "mediaId": null,
+      "idempotencyKey": "idemp_927075bd12055ba437b4b337",
+      "status": "SCHEDULED",
+      "createdAt": "2026-11-01T18:36:54.543Z",
+      "lastRunAt": null,
+      "executionCount": 0,
+      "logs": [
+        {
+          "timestamp": "2026-11-01T18:36:54.543Z",
+          "event": "SCHEDULED",
+          "details": "Scheduled for 2026-11-03T10:00:00.000Z"
+        }
+      ]
+    },
+    {
       "id": "sch_1793534701997_5gxj",
       "name": "Phase 13 Resilience Dispatch",
       "type": "ONCE",

@@ -129,11 +129,41 @@ class QueueSimulator {
                 simSmsBody += `\nMedia: ${this.getTrackedMediaUrl(mediaAsset, campaignId)}`;
             }
             console.log(`[Simulate Dual] (${platform}) To: ${rawPhone}\nBody:\n${body}\nMedia: ${mediaAsset ? mediaAsset.id : 'none'}`);
+            const waSid = 'SIM_WA_' + Date.now();
+            const smsSid = 'SIM_SMS_' + Date.now();
+
+            if (platform !== 'sms') {
+                await dispatchTelemetryService.recordDispatch({
+                    campaignId,
+                    channel: 'whatsapp',
+                    recipient: rawPhone,
+                    sid: waSid,
+                    status: 'delivered',
+                    hasMedia: Boolean(mediaAsset),
+                    mediaId: mediaAsset?.id || null,
+                    mediaType: mediaAsset?.mediaType || null,
+                    mediaUrl: mediaAsset ? this.getPublicMediaUrl(mediaAsset) : null
+                }).catch(() => {});
+            }
+            if (platform !== 'whatsapp') {
+                await dispatchTelemetryService.recordDispatch({
+                    campaignId,
+                    channel: 'sms',
+                    recipient: rawPhone,
+                    sid: smsSid,
+                    status: 'delivered',
+                    hasMedia: Boolean(mediaAsset),
+                    mediaId: mediaAsset?.id || null,
+                    mediaType: mediaAsset?.mediaType || null,
+                    mediaUrl: mediaAsset ? this.getTrackedMediaUrl(mediaAsset, campaignId) : null
+                }).catch(() => {});
+            }
+
             return {
                 success: true,
                 simulated: true,
-                whatsapp: { attempted: platform !== 'sms', sent: platform !== 'sms', sid: 'SIM_WA_' + Date.now(), mediaUrl: mediaAsset ? [this.getPublicMediaUrl(mediaAsset)] : undefined },
-                sms: { attempted: platform !== 'whatsapp', sent: platform !== 'whatsapp', sid: 'SIM_SMS_' + Date.now(), text: simSmsBody },
+                whatsapp: { attempted: platform !== 'sms', sent: platform !== 'sms', sid: waSid, mediaUrl: mediaAsset ? [this.getPublicMediaUrl(mediaAsset)] : undefined },
+                sms: { attempted: platform !== 'whatsapp', sent: platform !== 'whatsapp', sid: smsSid, text: simSmsBody },
                 body
             };
         }

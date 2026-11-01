@@ -1,6 +1,18 @@
 {
   "suppressionList": [
     {
+      "phone": "9876543210",
+      "reason": "User sent STOP during audit test",
+      "source": "INBOUND_SMS",
+      "addedAt": "2026-11-01T18:39:11.449Z"
+    },
+    {
+      "phone": "+919999900000",
+      "reason": "User sent STOP during audit test",
+      "source": "INBOUND_SMS",
+      "addedAt": "2026-11-01T18:38:13.243Z"
+    },
+    {
       "phone": "+19998887777",
       "reason": "Customer Inbound Opt-Out (STOP)",
       "source": "TWILIO_INBOUND_WEBHOOK",

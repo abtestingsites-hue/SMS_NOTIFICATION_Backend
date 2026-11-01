@@ -1,5 +1,131 @@
 [
   {
+    "id": "draft_1793558351441_2b017c24",
+    "name": "Persistence Integrity Audit Draft",
+    "description": "",
+    "status": "DRAFT",
+    "channel": "both",
+    "creativeAssetId": null,
+    "creativeAsset": null,
+    "contentBlocks": [],
+    "offerId": null,
+    "offer": null,
+    "audienceSelection": {
+      "type": "all",
+      "segmentName": "All",
+      "totalCount": 0,
+      "smsEligibleCount": 0,
+      "whatsappEligibleCount": 0,
+      "suppressedCount": 0,
+      "optedOutCount": 0,
+      "languageBreakdown": {}
+    },
+    "languageConfig": {
+      "selectedLanguages": [
+        "tamil",
+        "telugu",
+        "kannada"
+      ],
+      "defaultLanguage": "tamil",
+      "languageVariants": {},
+      "languageApprovals": {}
+    },
+    "scheduleConfig": {
+      "mode": "NOW",
+      "scheduledDate": "",
+      "scheduledTime": "",
+      "timezone": "Asia/Kolkata",
+      "followUps": []
+    },
+    "geminiExtraction": null,
+    "createdAt": "2026-11-01T18:39:11.441Z",
+    "updatedAt": "2026-11-01T18:39:11.441Z"
+  },
+  {
+    "id": "draft_1793558293239_a3efd11f",
+    "name": "Persistence Integrity Audit Draft",
+    "description": "",
+    "status": "DRAFT",
+    "channel": "both",
+    "creativeAssetId": null,
+    "creativeAsset": null,
+    "contentBlocks": [],
+    "offerId": null,
+    "offer": null,
+    "audienceSelection": {
+      "type": "all",
+      "segmentName": "All",
+      "totalCount": 0,
+      "smsEligibleCount": 0,
+      "whatsappEligibleCount": 0,
+      "suppressedCount": 0,
+      "optedOutCount": 0,
+      "languageBreakdown": {}
+    },
+    "languageConfig": {
+      "selectedLanguages": [
+        "tamil",
+        "telugu",
+        "kannada"
+      ],
+      "defaultLanguage": "tamil",
+      "languageVariants": {},
+      "languageApprovals": {}
+    },
+    "scheduleConfig": {
+      "mode": "NOW",
+      "scheduledDate": "",
+      "scheduledTime": "",
+      "timezone": "Asia/Kolkata",
+      "followUps": []
+    },
+    "geminiExtraction": null,
+    "createdAt": "2026-11-01T18:38:13.239Z",
+    "updatedAt": "2026-11-01T18:38:13.239Z"
+  },
+  {
+    "id": "draft_1793558214661_75da3724",
+    "name": "Persistence Integrity Audit Draft",
+    "description": "",
+    "status": "DRAFT",
+    "channel": "both",
+    "creativeAssetId": null,
+    "creativeAsset": null,
+    "contentBlocks": [],
+    "offerId": null,
+    "offer": null,
+    "audienceSelection": {
+      "type": "all",
+      "segmentName": "All",
+      "totalCount": 0,
+      "smsEligibleCount": 0,
+      "whatsappEligibleCount": 0,
+      "suppressedCount": 0,
+      "optedOutCount": 0,
+      "languageBreakdown": {}
+    },
+    "languageConfig": {
+      "selectedLanguages": [
+        "tamil",
+        "telugu",
+        "kannada"
+      ],
+      "defaultLanguage": "tamil",
+      "languageVariants": {},
+      "languageApprovals": {}
+    },
+    "scheduleConfig": {
+      "mode": "NOW",
+      "scheduledDate": "",
+      "scheduledTime": "",
+      "timezone": "Asia/Kolkata",
+      "followUps": []
+    },
+    "geminiExtraction": null,
+    "createdAt": "2026-11-01T18:36:54.661Z",
+    "updatedAt": "2026-11-01T18:36:54.661Z"
+  },
+  {
     "id": "draft_1793547911835_aeecc8ce",
     "name": "Diwali Festive Blitz Draft",
     "description": "",

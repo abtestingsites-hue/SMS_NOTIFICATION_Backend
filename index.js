@@ -1514,6 +1514,24 @@ app.post('/api/campaign-builder/launch', async (req, res) => {
     }
 });
 
+app.get('/api/campaign-builder/campaigns/:id/analytics', async (req, res) => {
+    try {
+        const analytics = await campaignBuilderService.getCampaignAnalytics(req.params.id);
+        res.json(analytics);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+app.get('/api/campaigns/:id/delivery-reconciliation', async (req, res) => {
+    try {
+        const analytics = await campaignBuilderService.getCampaignAnalytics(req.params.id);
+        res.json(analytics);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
 // Start scheduler background runner
 schedulerService.startRunner({ DataManager, QueueSimulator });
 
