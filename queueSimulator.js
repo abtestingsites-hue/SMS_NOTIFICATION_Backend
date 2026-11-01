@@ -525,6 +525,38 @@ class QueueSimulator {
             return false;
         }
     }
+
+    async dispatchFollowUpMessage({ customer, campaign, followUpRecord }) {
+        const aiTemplateService = require('./services/aiTemplateService');
+        const inboundWebhookService = require('./services/inboundWebhookService');
+        const inboundReplies = await inboundWebhookService.getInboundMessages().catch(() => ({ messages: [] }));
+
+        const eligibility = await aiTemplateService.checkFollowUpEligibility({
+            customer,
+            campaign,
+            followUpRecord,
+            inboundReplies: inboundReplies.messages || []
+        });
+
+        if (!eligibility.eligible) {
+            console.log(`[Follow-up Suppressed] Phone: ${customer.phone} -> ${eligibility.reason}`);
+            return { success: false, suppressed: true, reason: eligibility.reason };
+        }
+
+        const recipientName = customer.name || 'Valued Customer';
+        let body = (followUpRecord.messageBody || '')
+            .replace(/{{customer_name}}/g, recipientName)
+            .replace(/{{1}}/g, recipientName);
+
+        return await this.dispatchDualChannel({
+            to: customer.phone,
+            body: body,
+            smsBody: null,
+            platform: followUpRecord.channel || 'both',
+            mediaAsset: campaign?.mediaAsset || null,
+            campaignId: campaign?.id || null
+        });
+    }
 }
 
 module.exports = { QueueSimulator: new QueueSimulator() };

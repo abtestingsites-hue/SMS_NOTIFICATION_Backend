@@ -20,6 +20,7 @@ const inboundWebhookService = require('./services/inboundWebhookService');
 const storageProvider = require('./services/storageProvider');
 const notificationService = require('./services/notificationService');
 const dispatchTelemetryService = require('./services/dispatchTelemetryService');
+const aiTemplateService = require('./services/aiTemplateService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1095,6 +1096,275 @@ app.delete('/api/notifications', async (req, res) => {
 // =========================================================================
 // BACKGROUND RUNNER INITIATION & SERVER START
 // =========================================================================
+
+
+// =========================================================================
+// PHASE 17: AI-POWERED TEMPLATE GENERATOR & MULTILINGUAL AUTOMATION
+// =========================================================================
+
+app.post('/api/ai-templates/analyze-image', mediaUpload.single('image'), async (req, res) => {
+    try {
+        let mediaId = req.body?.mediaId || req.body?.mediaAsset?.id || null;
+        let fileBuffer = req.file ? await fs.promises.readFile(req.file.path) : null;
+        let originalname = req.file?.originalname || req.body?.mediaAsset?.originalName || req.body?.originalname || '';
+        let mimeType = req.file?.mimetype || req.body?.mediaAsset?.mimeType || 'image/jpeg';
+        let imageHint = req.body?.imageHint || '';
+
+        if (req.file) {
+            try {
+                const asset = await mediaService.registerUpload(req.file, {
+                    caption: 'Uploaded for AI Template Analysis',
+                    tags: ['AI_GENERATED']
+                });
+                mediaId = asset.id;
+            } catch (regErr) {
+                console.warn('Auto-register upload note:', regErr.message);
+            }
+        }
+
+        const result = await aiTemplateService.analyzeImage({
+            mediaId,
+            fileBuffer,
+            originalname,
+            mimeType,
+            imageHint
+        });
+
+        res.json(result);
+    } catch (err) {
+        console.error('AI image analysis error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/generate', async (req, res) => {
+    try {
+        const { generationId, userId, sourceMediaId, sourceMediaAsset, extractedOfferData, languages, channel, tone } = req.body;
+        if (!extractedOfferData) {
+            return res.status(400).json({ error: 'extractedOfferData is required' });
+        }
+        const record = await aiTemplateService.generateContent({
+            generationId,
+            userId,
+            sourceMediaId,
+            sourceMediaAsset,
+            extractedOfferData,
+            languages: Array.isArray(languages) ? languages : ['english'],
+            channel: channel || 'both',
+            tone: tone || 'promotional'
+        });
+        res.json(record);
+    } catch (err) {
+        console.error('AI generate content error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/generate-followups', async (req, res) => {
+    try {
+        const { generationId, campaignId, schedule, languages, channel, tone, extractedOfferData } = req.body;
+        const followUps = await aiTemplateService.generateFollowUps({
+            generationId,
+            campaignId,
+            schedule: schedule || [],
+            languages: languages || ['english'],
+            channel: channel || 'both',
+            tone: tone || 'promotional',
+            extractedOfferData: extractedOfferData || {}
+        });
+        res.json({ success: true, followUps });
+    } catch (err) {
+        console.error('AI generate follow-ups error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/ai-templates', async (req, res) => {
+    try {
+        const list = await aiTemplateService.getAllGenerations();
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/ai-templates/:id', async (req, res) => {
+    try {
+        const item = await aiTemplateService.getGeneration(req.params.id);
+        if (!item) return res.status(404).json({ error: 'AI Generation record not found' });
+        res.json(item);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/ai-templates/:id', async (req, res) => {
+    try {
+        const { variantId, messageBody } = req.body;
+        if (!variantId || messageBody === undefined) {
+            return res.status(400).json({ error: 'variantId and messageBody are required' });
+        }
+        const updated = await aiTemplateService.updateVariantCopy({
+            generationId: req.params.id,
+            variantId,
+            messageBody
+        });
+        res.json({ success: true, variant: updated });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/:id/approve', async (req, res) => {
+    try {
+        const { variantId, approveAll = false, approvedBy = 'admin' } = req.body;
+        const result = await aiTemplateService.approveVariant({
+            generationId: req.params.id,
+            variantId,
+            approveAll,
+            approvedBy
+        });
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/:id/save', async (req, res) => {
+    try {
+        const { variantId, templateName, category } = req.body;
+        const gen = await aiTemplateService.getGeneration(req.params.id);
+        if (!gen) return res.status(404).json({ error: 'AI Generation not found' });
+
+        const variant = variantId ? gen.variants.find(v => v.id === variantId) : gen.variants[0];
+        if (!variant) return res.status(404).json({ error: 'Variant not found' });
+
+        const savedItem = await DataManager.saveTemplateItem({
+            name: templateName || `${gen.extractedOfferData.businessName} - ${variant.language.toUpperCase()} (${variant.variantType})`,
+            body: variant.messageBody,
+            channel: variant.channel || gen.channel || 'both',
+            mediaId: gen.sourceMediaId || null,
+            mediaAsset: gen.sourceMediaAsset || null,
+            category: category || 'AI_Generated'
+        });
+
+        if (req.body.setActive) {
+            await DataManager.saveTemplate({
+                template: variant.messageBody,
+                mediaId: gen.sourceMediaId || null,
+                mediaAsset: gen.sourceMediaAsset || null,
+                channel: variant.channel || gen.channel || 'both'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'AI template successfully saved to template studio and library',
+            template: savedItem
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/:id/test', async (req, res) => {
+    try {
+        const { variantId, recipient, recipientName = 'Customer' } = req.body;
+        const gen = await aiTemplateService.getGeneration(req.params.id);
+        if (!gen) return res.status(404).json({ error: 'AI Generation not found' });
+
+        const variant = variantId ? gen.variants.find(v => v.id === variantId) : gen.variants[0];
+        if (!variant) return res.status(404).json({ error: 'Variant not found' });
+
+        const targetNumber = recipient || process.env.CUSTOMER_CARE_NUMBER || '+916369825386';
+
+        const governance = await governanceService.validateDispatch({ phone: targetNumber });
+        if (!governance.allowed) {
+            return res.status(403).json({ success: false, error: governance.reason });
+        }
+
+        let body = variant.messageBody
+            .replace(/{{customer_name}}/g, recipientName)
+            .replace(/{{1}}/g, recipientName)
+            .replace(/{{business_name}}/g, gen.extractedOfferData.businessName || 'Trends')
+            .replace(/{{offer_name}}/g, gen.extractedOfferData.offerTitle || 'Special Offer')
+            .replace(/{{offer_code}}/g, gen.extractedOfferData.couponCode || 'SUMMER25')
+            .replace(/{{2}}/g, `${gen.extractedOfferData.discount || '25% OFF'} with ${gen.extractedOfferData.couponCode || 'SUMMER25'}`)
+            .replace(/{{valid_until}}/g, gen.extractedOfferData.validUntil || '15 Aug 2026')
+            .replace(/{{3}}/g, gen.extractedOfferData.validUntil || '15 Aug 2026')
+            .replace(/{{care_number}}/g, gen.extractedOfferData.contactNumber || targetNumber);
+
+        const dispatchResult = await QueueSimulator.dispatchDualChannel({
+            to: targetNumber,
+            body: body,
+            smsBody: null,
+            platform: variant.channel || 'both',
+            mediaAsset: gen.sourceMediaAsset || null
+        });
+
+        res.json({
+            success: dispatchResult.success,
+            message: `Carrier test dispatched in ${variant.language.toUpperCase()} (${variant.channel.toUpperCase()})`,
+            details: dispatchResult
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/ai-templates/:id/use-in-campaign', async (req, res) => {
+    try {
+        const { variantId, campaignName, validUntil, targetAudience = 'All', scheduleDelayHours = 0 } = req.body;
+        const gen = await aiTemplateService.getGeneration(req.params.id);
+        if (!gen) return res.status(404).json({ error: 'AI Generation not found' });
+
+        const variant = variantId ? gen.variants.find(v => v.id === variantId) : gen.variants[0];
+        if (!variant) return res.status(404).json({ error: 'Variant not found' });
+
+        const customers = await DataManager.getCustomers();
+
+        let scheduledTime = new Date();
+        if (scheduleDelayHours > 0) {
+            scheduledTime.setHours(scheduledTime.getHours() + parseInt(scheduleDelayHours));
+        }
+
+        const newCampaign = {
+            id: Date.now(),
+            name: campaignName || `${gen.extractedOfferData.businessName} - ${variant.language.toUpperCase()} Broadcast`,
+            status: scheduleDelayHours > 0 ? 'SCHEDULED' : 'PENDING',
+            total: customers.length,
+            sent: 0,
+            createdAt: new Date().toISOString(),
+            scheduledFor: scheduledTime.toISOString(),
+            validUntil: validUntil || gen.extractedOfferData.validUntil || '15 Aug 2026',
+            targetAudience: targetAudience,
+            platform: variant.channel || 'both',
+            template: variant.messageBody,
+            mediaId: gen.sourceMediaId || null,
+            mediaAsset: gen.sourceMediaAsset || null,
+            mediaEnabled: Boolean(gen.sourceMediaId),
+            mediaType: gen.sourceMediaAsset?.mediaType || null,
+            language: variant.language,
+            aiGenerationId: gen.id,
+            customerCareNumber: process.env.CUSTOMER_CARE_NUMBER || '+916369825386',
+            sendToCustomerCare: true,
+            customerCareNotified: false
+        };
+
+        await DataManager.createCampaign(newCampaign);
+        QueueSimulator.scheduleCampaign(newCampaign.id, scheduledTime);
+
+        res.json({
+            success: true,
+            message: `Multilingual campaign #${newCampaign.id} launched successfully`,
+            campaignId: newCampaign.id,
+            language: variant.language,
+            mediaEnabled: newCampaign.mediaEnabled
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // Start scheduler background runner
 schedulerService.startRunner({ DataManager, QueueSimulator });

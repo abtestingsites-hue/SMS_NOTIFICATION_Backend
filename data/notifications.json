@@ -1,6 +1,133 @@
 {
   "notifications": [
     {
+      "id": "notif_1793534702029_ecfce9a6",
+      "userId": "admin",
+      "type": "success",
+      "category": "SYSTEM",
+      "title": "Scheduled Broadcast Executed",
+      "message": "Scheduled broadcast \"Phase 13 Resilience Dispatch\" executed successfully. Dispatched: 0.",
+      "relatedEntityType": "schedule",
+      "relatedEntityId": "sch_1793534701997_5gxj",
+      "actionUrl": "scheduler",
+      "idempotencyKey": "schedule_completed_sch_1793534701997_5gxj_1793534702028",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:05:02.029Z",
+      "readAt": null,
+      "metadata": {}
+    },
+    {
+      "id": "notif_1793534701764_9fe17611",
+      "userId": "admin",
+      "type": "warning",
+      "category": "GOVERNANCE",
+      "title": "Customer Opt-Out Recorded",
+      "message": "Recipient +19998887777 sent opt-out keyword \"STOP\". Added to suppression registry.",
+      "relatedEntityType": "suppression",
+      "relatedEntityId": "+19998887777",
+      "actionUrl": "settings",
+      "idempotencyKey": "optout_+19998887777_SM_optout_test_1793534701743",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:05:01.764Z",
+      "readAt": null,
+      "metadata": {
+        "phone": "+19998887777",
+        "channel": "sms"
+      }
+    },
+    {
+      "id": "notif_1793534678190_43eb43e8",
+      "userId": "admin",
+      "type": "warning",
+      "category": "CAMPAIGN",
+      "title": "Rate Limit Warning",
+      "message": "Approaching daily threshold",
+      "relatedEntityType": null,
+      "relatedEntityId": null,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "notif_test_1793534678189",
+      "isRead": true,
+      "createdAt": "2026-11-01T12:04:38.190Z",
+      "readAt": "2026-11-01T12:04:38.196Z",
+      "metadata": {}
+    },
+    {
+      "id": "notif_1793534661952_c8d42cfb",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Royal Silk Sarees - TAMIL Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793534660994,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793534660994",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:04:21.952Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793534660994,
+        "sentCount": 0
+      }
+    },
+    {
+      "id": "notif_1793534641001_06228b03",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Royal Silk Sarees - TAMIL Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793534637972,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793534637972",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:04:01.001Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793534637972,
+        "sentCount": 0
+      }
+    },
+    {
+      "id": "notif_1793534639994_eb9e4d5d",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Phase 16 Verified Media Campaign\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793532466870,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793532466870",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:03:59.994Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793532466870,
+        "sentCount": 0
+      }
+    },
+    {
+      "id": "notif_1793534639016_0b6feff3",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Phase 16 Media Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793531744075,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793531744075",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:03:59.016Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793531744075,
+        "sentCount": 0
+      }
+    },
+    {
       "id": "notif_1793532500639_e8832b31",
       "userId": "admin",
       "type": "success",

@@ -1,6 +1,47 @@
 {
   "media": [
     {
+      "id": "med_1793534701787_uyloz",
+      "filename": "durable_1793534701778_4c4b6a3be131.png",
+      "originalName": "test_logo.png",
+      "mimeType": "image/png",
+      "mediaType": "image",
+      "size": 8,
+      "checksum": "4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6",
+      "storageDriver": "DURABLE_OBJECT_STORAGE",
+      "magicBytesVerified": true,
+      "url": "/uploads/media/durable_1793534701778_4c4b6a3be131.png",
+      "assetStreamUrl": "/api/media/asset/med_1793534701787_uyloz",
+      "uploadedAt": "2026-11-01T12:05:01.787Z",
+      "caption": "Phase 13 Verified Logo",
+      "tags": [],
+      "references": []
+    },
+    {
+      "id": "med_1793534666370_9m5yx",
+      "filename": "asset_test_phase16_1793534666366.jpg",
+      "originalName": "Phase16_Banner.jpg",
+      "mimeType": "image/jpeg",
+      "mediaType": "image",
+      "size": 22,
+      "checksum": "473715a932e74c8d8588b2c53587f16ddbdb5ec86a0b55d05207bb08d818df14",
+      "storageDriver": "DURABLE_OBJECT_STORAGE",
+      "magicBytesVerified": true,
+      "url": "/uploads/media/asset_test_phase16_1793534666366.jpg",
+      "assetStreamUrl": "/api/media/asset/med_1793534666370_9m5yx",
+      "uploadedAt": "2026-11-01T12:04:26.370Z",
+      "caption": "Phase 16 Test Creative",
+      "tags": [
+        "Phase16",
+        "Autumn"
+      ],
+      "references": [
+        "template:active",
+        "template:Diwali Festive Mega Offer",
+        "campaign:Phase 16 Verified Media Campaign"
+      ]
+    },
+    {
       "id": "med_1793532500487_zmx19",
       "filename": "durable_1793532500484_4c4b6a3be131.png",
       "originalName": "test_logo.png",

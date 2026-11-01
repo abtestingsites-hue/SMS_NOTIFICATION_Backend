@@ -1,6 +1,39 @@
 {
   "schedules": [
     {
+      "id": "sch_1793534701997_5gxj",
+      "name": "Phase 13 Resilience Dispatch",
+      "type": "ONCE",
+      "scheduledAt": "2026-11-01T12:04:56.996Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{1}}, special update from SMS Campaign System!",
+      "offerCode": "SUMMER25",
+      "mediaId": null,
+      "idempotencyKey": "idemp_6fe6b4259869c32128e27d18",
+      "status": "COMPLETED",
+      "createdAt": "2026-11-01T12:05:01.997Z",
+      "lastRunAt": "2026-11-01T12:05:02.002Z",
+      "executionCount": 1,
+      "logs": [
+        {
+          "timestamp": "2026-11-01T12:05:02.028Z",
+          "event": "EXECUTED",
+          "details": "Dispatched to 0 recipients (17 suppressed by governance)"
+        },
+        {
+          "timestamp": "2026-11-01T12:05:01.997Z",
+          "event": "SCHEDULED",
+          "details": "Scheduled for 2026-11-01T12:04:56.996Z"
+        }
+      ],
+      "lockedBy": null,
+      "lockedAt": null,
+      "lockExpiresAt": null,
+      "retryCount": 0
+    },
+    {
       "id": "sch_1793532500614_o6lg",
       "name": "Phase 13 Resilience Dispatch",
       "type": "ONCE",
