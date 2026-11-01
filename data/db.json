@@ -371,7 +371,7 @@
     {
       "id": 1793534666405,
       "name": "Phase 16 Verified Media Campaign",
-      "status": "SCHEDULED",
+      "status": "COMPLETED",
       "total": 17,
       "sent": 0,
       "createdAt": "2026-11-01T12:04:26.405Z",
@@ -408,7 +408,51 @@
       "mediaType": "image",
       "customerCareNumber": "+91 6369825386",
       "sendToCustomerCare": true,
-      "customerCareNotified": false
+      "customerCareNotified": true
+    },
+    {
+      "id": 1793536197772,
+      "name": "Royal Silk Sarees - TAMIL Broadcast",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T12:29:57.772Z",
+      "scheduledFor": "2026-11-01T12:29:57.772Z",
+      "validUntil": "2026-11-20",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}, Royal Silk Sarees வழங்கும் Deepavali Special Mega Privilege! குறியீடு SILK40 பயன்படுத்தி 40% Flat Discount தள்ளுபடி பெறுங்கள். செல்லுபடியாகும் நாள்: 2026-11-20. தொடர்புக்கு: +919876543210. நிறுத்த STOP அனுப்பவும்.\n\nஅவசர சலுகை!",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "language": "tamil",
+      "aiGenerationId": "gen_1793536196626_6cznp",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
+    },
+    {
+      "id": 1793536224572,
+      "name": "Royal Silk Sarees - TAMIL Broadcast",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T12:30:24.572Z",
+      "scheduledFor": "2026-11-01T12:30:24.572Z",
+      "validUntil": "2026-11-20",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}, Royal Silk Sarees வழங்கும் Deepavali Special Mega Privilege! குறியீடு SILK40 பயன்படுத்தி 40% Flat Discount தள்ளுபடி பெறுங்கள். செல்லுபடியாகும் நாள்: 2026-11-20. தொடர்புக்கு: +919876543210. நிறுத்த STOP அனுப்பவும்.\n\nஅவசர சலுகை!",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "language": "tamil",
+      "aiGenerationId": "gen_1793536223499_wbc67",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
     }
   ],
   "offers": [
@@ -503,6 +547,28 @@
   },
   "templateChannel": "both",
   "templatesList": [
+    {
+      "id": "tpl_1793536223557_b711",
+      "name": "Diwali Tamil Silk Mega Promo",
+      "body": "வணக்கம் {{customer_name}}, Royal Silk Sarees வழங்கும் Deepavali Special Mega Privilege! குறியீடு SILK40 பயன்படுத்தி 40% Flat Discount தள்ளுபடி பெறுங்கள். செல்லுபடியாகும் நாள்: 2026-11-20. தொடர்புக்கு: +919876543210. நிறுத்த STOP அனுப்பவும்.\n\nஅவசர சலுகை!",
+      "channel": "both",
+      "mediaId": null,
+      "mediaAsset": null,
+      "category": "Promotional",
+      "createdAt": "2026-11-01T12:30:23.557Z",
+      "updatedAt": "2026-11-01T12:30:23.557Z"
+    },
+    {
+      "id": "tpl_1793536196753_eu30",
+      "name": "Diwali Tamil Silk Mega Promo",
+      "body": "வணக்கம் {{customer_name}}, Royal Silk Sarees வழங்கும் Deepavali Special Mega Privilege! குறியீடு SILK40 பயன்படுத்தி 40% Flat Discount தள்ளுபடி பெறுங்கள். செல்லுபடியாகும் நாள்: 2026-11-20. தொடர்புக்கு: +919876543210. நிறுத்த STOP அனுப்பவும்.\n\nஅவசர சலுகை!",
+      "channel": "both",
+      "mediaId": null,
+      "mediaAsset": null,
+      "category": "Promotional",
+      "createdAt": "2026-11-01T12:29:56.753Z",
+      "updatedAt": "2026-11-01T12:29:56.753Z"
+    },
     {
       "id": "tpl_1793534660011_km97",
       "name": "Diwali Tamil Silk Mega Promo",

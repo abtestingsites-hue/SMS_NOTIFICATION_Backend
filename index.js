@@ -107,6 +107,31 @@ app.post('/api/upload/customers', upload.single('file'), (req, res) => {
 });
 
 // Get Customers List & Registry Analytics
+// Update customer preferred regional language
+app.patch('/api/customers/:id/language', async (req, res) => {
+    try {
+        const { language } = req.body;
+        if (!language) return res.status(400).json({ error: 'Language parameter required' });
+        const updated = await DataManager.updateCustomerLanguage(req.params.id, language);
+        if (!updated) return res.status(404).json({ error: 'Customer not found' });
+        res.json({ success: true, customer: updated });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update audience segment regional language
+app.post('/api/customers/segment-language', async (req, res) => {
+    try {
+        const { segment, language } = req.body;
+        if (!language) return res.status(400).json({ error: 'Language parameter required' });
+        const count = await DataManager.updateSegmentLanguage(segment || 'All', language);
+        res.json({ success: true, updatedCount: count });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/customers', async (req, res) => {
     try {
         const customers = await DataManager.getCustomers();
@@ -1212,6 +1237,20 @@ app.patch('/api/ai-templates/:id', async (req, res) => {
         res.json({ success: true, variant: updated });
     } catch (err) {
         res.status(400).json({ error: err.message });
+    }
+});
+
+// Validate regional language version approvals before broadcast (Strict no automatic substitution)
+app.post('/api/ai-templates/:id/validate-approval', async (req, res) => {
+    try {
+        const { requiredLanguages = [] } = req.body;
+        const result = await aiTemplateService.validateLanguageApproval({
+            generationId: req.params.id,
+            requiredLanguages
+        });
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ valid: false, error: err.message });
     }
 });
 

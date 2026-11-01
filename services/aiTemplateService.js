@@ -7,20 +7,24 @@ const governanceService = require('./governanceService');
 const AI_GENERATIONS_FILE = path.join(__dirname, '..', 'data', 'ai_generations.json');
 const CAMPAIGN_FOLLOWUPS_FILE = path.join(__dirname, '..', 'data', 'campaign_followups.json');
 
-// Supported Indian Regional Languages
+// The 6 Required Regional Languages for Initial Release
+const REQUIRED_REGIONAL_LANGUAGES = [
+    { code: 'tamil', langCode: 'ta', label: 'Tamil', native: 'தமிழ்', script: 'Tamil' },
+    { code: 'telugu', langCode: 'te', label: 'Telugu', native: 'తెలుగు', script: 'Telugu' },
+    { code: 'kannada', langCode: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', script: 'Kannada' },
+    { code: 'malayalam', langCode: 'ml', label: 'Malayalam', native: 'മലയാളം', script: 'Malayalam' },
+    { code: 'hindi', langCode: 'hi', label: 'Hindi', native: 'हिन्दी', script: 'Devanagari' },
+    { code: 'marathi', langCode: 'mr', label: 'Marathi', native: 'मराठी', script: 'Devanagari' }
+];
+
 const SUPPORTED_LANGUAGES = [
-    { code: 'english', label: 'English', native: 'English', script: 'Latin' },
-    { code: 'tamil', label: 'Tamil', native: 'தமிழ்', script: 'Tamil' },
-    { code: 'hindi', label: 'Hindi', native: 'हिंदी', script: 'Devanagari' },
-    { code: 'telugu', label: 'Telugu', native: 'తెలుగు', script: 'Telugu' },
-    { code: 'malayalam', label: 'Malayalam', native: 'മലയാളം', script: 'Malayalam' },
-    { code: 'kannada', label: 'Kannada', native: 'ಕನ್ನಡ', script: 'Kannada' },
-    { code: 'bengali', label: 'Bengali', native: 'বাংলা', script: 'Bengali' },
-    { code: 'marathi', label: 'Marathi', native: 'मराठी', script: 'Devanagari' },
-    { code: 'gujarati', label: 'Gujarati', native: 'ગુજરાતી', script: 'Gujarati' },
-    { code: 'punjabi', label: 'Punjabi', native: 'ਪੰਜਾਬੀ', script: 'Gurmukhi' },
-    { code: 'odia', label: 'Odia', native: 'ଓଡ଼ିଆ', script: 'Odia' },
-    { code: 'urdu', label: 'Urdu', native: 'اردو', script: 'Arabic' }
+    ...REQUIRED_REGIONAL_LANGUAGES,
+    { code: 'english', langCode: 'en', label: 'English', native: 'English', script: 'Latin' },
+    { code: 'bengali', langCode: 'bn', label: 'Bengali', native: 'বাংলা', script: 'Bengali' },
+    { code: 'gujarati', langCode: 'gu', label: 'Gujarati', native: 'ગુજરાતી', script: 'Gujarati' },
+    { code: 'punjabi', langCode: 'pa', label: 'Punjabi', native: 'ਪੰਜਾਬੀ', script: 'Gurmukhi' },
+    { code: 'odia', langCode: 'or', label: 'Odia', native: 'ଓଡ଼ିଆ', script: 'Odia' },
+    { code: 'urdu', langCode: 'ur', label: 'Urdu', native: 'اردو', script: 'Arabic' }
 ];
 
 // Tone modifiers
@@ -562,7 +566,21 @@ Strict rules:
     }
 
     // Step 3 — AI Follow-Up Message Generator
-        async generateFollowUps({
+            // Normalize language codes
+    normalizeLanguage(lang) {
+        if (!lang) return 'tamil';
+        const l = lang.toLowerCase().trim();
+        if (l === 'ta' || l === 'tamil') return 'tamil';
+        if (l === 'te' || l === 'telugu') return 'telugu';
+        if (l === 'kn' || l === 'kannada') return 'kannada';
+        if (l === 'ml' || l === 'malayalam') return 'malayalam';
+        if (l === 'hi' || l === 'hindi') return 'hindi';
+        if (l === 'mr' || l === 'marathi') return 'marathi';
+        if (l === 'en' || l === 'english') return 'english';
+        return l;
+    }
+
+    async generateFollowUps({
         generationId = null,
         campaignId = null,
         schedule = [],
@@ -593,7 +611,7 @@ Strict rules:
 
         const rawLanguages = (languages && languages.length > 0)
             ? languages
-            : (language ? [language] : (gen?.languages || ['english']));
+            : (language ? [language] : (gen?.languages || ['tamil']));
 
         const offer = Object.keys(extractedOfferData).length > 0
             ? extractedOfferData
@@ -612,41 +630,95 @@ Strict rules:
             const stage = item.stage || (seq === 1 ? 'INITIAL' : seq === 2 ? 'REMINDER' : seq === 3 ? 'REINFORCEMENT' : 'EXPIRY');
             const scheduledInterval = item.scheduledInterval || item.interval || `Day ${seq * 2} — 11:00 AM`;
 
-            for (const lang of rawLanguages) {
-                const langCode = lang.toLowerCase();
+            for (const rawLang of rawLanguages) {
+                const langCode = this.normalizeLanguage(rawLang);
                 let msg = '';
 
-                if (langCode === 'tamil') {
-                    if (stage === 'INITIAL') {
-                        msg = `வணக்கம் {{customer_name}}, ${bus} வழங்கும் சிறப்பு ${disc} சலுகை! குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}.`;
-                    } else if (stage === 'REMINDER') {
-                        msg = `நினைவூட்டல்: வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${disc} சலுகை இன்னும் உங்களுக்காக காத்திருக்கிறது. குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}.`;
-                    } else if (stage === 'REINFORCEMENT') {
-                        msg = `அன்புள்ள {{customer_name}}, எளிய பரிமாற்றம் மற்றும் தரமான ஆடைத் தொகுப்பு! ${bus} இன் ${disc} சலுகையை குறியீடு ${code} மூலம் இப்போதே பயன்படுத்துங்கள்.`;
-                    } else {
-                        msg = `கடைசி வாய்ப்பு! {{customer_name}}, ${bus} இன் ${disc} சலுகை இன்றோடு முடிவடைகிறது. குறியீடு: ${code}. உடனே வருகை தரவும்!`;
-                    }
-                } else if (langCode === 'hindi') {
-                    if (stage === 'INITIAL') {
-                        msg = `नमस्ते {{customer_name}}, ${bus} की ओर से विशेष ${disc} छूट! कोड: ${code}। अंतिम तिथि: ${expiry}।`;
-                    } else if (stage === 'REMINDER') {
-                        msg = `स्मरण पत्र: नमस्ते {{customer_name}}, ${bus} का ${disc} ऑफर अभी भी आपके लिए उपलब्ध है। कोड: ${code}। अंतिम तिथि: ${expiry}।`;
-                    } else if (stage === 'REINFORCEMENT') {
-                        msg = `नमस्ते {{customer_name}}, आसान रिटर्न और प्रीमियम फैब्रिक! ${bus} पर कोड ${code} का उपयोग कर ${disc} का लाभ उठाएं।`;
-                    } else {
-                        msg = `अंतिम अवसर! {{customer_name}}, ${bus} का विशेष ${disc} ऑफर आज समाप्त हो रहा है। कोड: ${code} का उपयोग तुरंत करें!`;
-                    }
-                } else {
-                    // English default
-                    if (stage === 'INITIAL') {
-                        msg = `Hi {{customer_name}}, enjoy ${disc} on your purchase at ${bus}! Use code ${code} before ${expiry}. Questions? Call ${care}.`;
-                    } else if (stage === 'REMINDER') {
-                        msg = `Reminder: Hi {{customer_name}}, don't forget your ${disc} privilege at ${bus}! Use code ${code} before ${expiry}. Visit us today.`;
-                    } else if (stage === 'REINFORCEMENT') {
-                        msg = `Hi {{customer_name}}, premium quality & easy exchanges guaranteed! Claim your ${disc} at ${bus} using code ${code}. Questions? Call ${care}.`;
-                    } else {
-                        msg = `Final Call: Hi {{customer_name}}, your ${bus} ${disc} offer expires today (${expiry})! Use code ${code} before it closes.`;
-                    }
+                switch (langCode) {
+                    case 'tamil':
+                        if (stage === 'INITIAL') {
+                            msg = `வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${disc} சிறப்பு சலுகை! குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}. தொடர்புக்கு: ${care}. நிறுத்த STOP அனுப்பவும்.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `நினைவூட்டல்: வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${disc} சலுகை இன்னும் உங்களுக்காக காத்திருக்கிறது. குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `அன்புள்ள {{customer_name}}, எளிய பரிமாற்றம் மற்றும் தரமான ஆடைத் தொகுப்பு! ${bus} இன் ${disc} சலுகையை குறியீடு ${code} மூலம் இப்போதே பயன்படுத்துங்கள்.`;
+                        } else {
+                            msg = `கடைசி வாய்ப்பு! {{customer_name}}, ${bus} இன் ${disc} சலுகை இன்றோடு முடிவடைகிறது. குறியீடு: ${code}. உடனே வருகை தரவும்!`;
+                        }
+                        break;
+
+                    case 'telugu':
+                        if (stage === 'INITIAL') {
+                            msg = `నమస్కారం {{customer_name}}, ${bus} నుండి ప్రత్యేక ${disc} ఆఫర్! కోడ్: ${code}. గడువు: ${expiry}. సంప్రదించండి: ${care}. ఆపడానికి STOP పంపండి.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `రిమైండర్: నమస్కారం {{customer_name}}, ${bus} లో మీ ${disc} రాయితీ ఇంకా అందుబాటులో ఉంది. కోడ్: ${code}. గడువు: ${expiry}.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `ప్రియమైన {{customer_name}}, సులభమైన ఎక్స్ఛేంజ్ మరియు నాణ్యత హామీ! ${bus} లో కోడ్ ${code} ఉపయోగించి ${disc} ప్రయోజనం పొందండి.`;
+                        } else {
+                            msg = `చివరి అవకాశం! {{customer_name}}, ${bus} ${disc} ఆఫర్ ఈరోజే ముగుస్తుంది. కోడ్: ${code}. ఇప్పుడే సందర్శించండి!`;
+                        }
+                        break;
+
+                    case 'kannada':
+                        if (stage === 'INITIAL') {
+                            msg = `ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ವತಿಯಿಂದ ವಿಶೇಷ ${disc} ಕೊಡುಗೆ! ಕೋಡ್: ${code}. ಮಾನ್ಯತೆ: ${expiry}. ಸಂಪರ್ಕಿಸಿ: ${care}.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `ನೆನಪಿಸುವಿಕೆ: ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ನ ${disc} ರಿಯಾಯಿತಿ ಕೊಡುಗೆ ಇನ್ನೂ ಲಭ್ಯವಿದೆ. ಕೋಡ್: ${code}. ಮಾನ್ಯತೆ: ${expiry}.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `ಆತ್ಮೀಯ {{customer_name}}, ಸುಲಭ ವಿನಿಮಯ ಮತ್ತು ಉತ್ತಮ ಗುಣಮಟ್ಟದ ಭರವಸೆ! ${bus} ನಲ್ಲಿ ಕೋಡ್ ${code} ಬಳಸಿ ${disc} ಲಾಭ ಪಡೆಯಿರಿ.`;
+                        } else {
+                            msg = `ಅಂತಿಮ ಅವಕಾಶ! {{customer_name}}, ${bus} ನ ${disc} ಆಫರ್ ಇಂದು ಮುಕ್ತಾಯಗೊಳ್ಳುತ್ತದೆ. ಕೋಡ್: ${code}. ಇಂದೇ ಭೇಟಿ ನೀಡಿ!`;
+                        }
+                        break;
+
+                    case 'malayalam':
+                        if (stage === 'INITIAL') {
+                            msg = `നമസ്കാരം {{customer_name}}, ${bus} അവതരിപ്പിക്കുന്ന പ്രത്യേക ${disc} കിഴിവ്! കോഡ്: ${code}. കാലാവധി: ${expiry}. കെയർ: ${care}.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `ഓർമ്മപ്പെടുത്തൽ: നമസ്കാരം {{customer_name}}, ${bus} നൽകുന്ന ${disc} ഓഫർ ഇപ്പോഴും ലഭ്യമാണ്. കോഡ്: ${code}. കാലാവധി: ${expiry}.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `പ്രിയ {{customer_name}}, മികച്ച ഗുണനിലവാരവും എളുപ്പമുള്ള എക്സ്ചേഞ്ചും! ${bus} ൽ കോഡ് ${code} ഉപയോഗിച്ച് ${disc} സ്വന്തമാക്കൂ.`;
+                        } else {
+                            msg = `അവസാന അവസരം! {{customer_name}}, ${bus} ന്റെ ${disc} ഓഫർ ഇന്ന് അവസാനിക്കുന്നു. കോഡ്: ${code}. ഇപ്പോൾ തന്നെ സന്ദർശിക്കൂ!`;
+                        }
+                        break;
+
+                    case 'hindi':
+                        if (stage === 'INITIAL') {
+                            msg = `नमस्ते {{customer_name}}, ${bus} की ओर से विशेष ${disc} छूट! कोड: ${code}। अंतिम तिथि: ${expiry}। हेल्पलाइन: ${care}।`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `स्मरण पत्र: नमस्ते {{customer_name}}, ${bus} का ${disc} ऑफर अभी भी आपके लिए उपलब्ध है। कोड: ${code}। अंतिम तिथि: ${expiry}।`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `नमस्ते {{customer_name}}, आसान रिटर्न और प्रीमियम क्वालिटी की गारंटी! ${bus} पर कोड ${code} का उपयोग कर ${disc} का लाभ उठाएं।`;
+                        } else {
+                            msg = `अंतिम अवसर! {{customer_name}}, ${bus} का विशेष ${disc} ऑफर आज समाप्त हो रहा है। कोड: ${code} का उपयोग तुरंत करें!`;
+                        }
+                        break;
+
+                    case 'marathi':
+                        if (stage === 'INITIAL') {
+                            msg = `नमस्कार {{customer_name}}, ${bus} कडून खास ${disc} सवलत! कोड: ${code}. मुदत: ${expiry}. संपर्क: ${care}.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `आठवण: नमस्कार {{customer_name}}, ${bus} ची ${disc} सवलत अजूनही उपलब्ध आहे. कोड: ${code}. अंतिम मुदत: ${expiry}.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `सस्नेह नमस्कार {{customer_name}}, सुलभ एक्सचेंज आणि उत्तम दर्जेदार सेवा! ${bus} वर कोड ${code} वापरून ${disc} चा लाभ घ्या.`;
+                        } else {
+                            msg = `शेवटची संधी! {{customer_name}}, ${bus} ची ${disc} ऑफर आज संपत आहे. कोड: ${code}. लगेच भेट द्या!`;
+                        }
+                        break;
+
+                    case 'english':
+                    default:
+                        if (stage === 'INITIAL') {
+                            msg = `Hi {{customer_name}}, enjoy ${disc} on your purchase at ${bus}! Use code ${code} before ${expiry}. Questions? Call ${care}.`;
+                        } else if (stage === 'REMINDER') {
+                            msg = `Reminder: Hi {{customer_name}}, don't forget your ${disc} privilege at ${bus}! Use code ${code} before ${expiry}. Visit us today.`;
+                        } else if (stage === 'REINFORCEMENT') {
+                            msg = `Hi {{customer_name}}, premium quality & easy exchanges guaranteed! Claim your ${disc} at ${bus} using code ${code}. Questions? Call ${care}.`;
+                        } else {
+                            msg = `Final Call: Hi {{customer_name}}, your ${bus} ${disc} offer expires today (${expiry})! Use code ${code} before it closes.`;
+                        }
+                        break;
                 }
 
                 const rec = {
@@ -673,6 +745,42 @@ Strict rules:
         await this._writeFollowUps(updatedFollowUps);
 
         return followUpRecords;
+    }
+
+    // Strict Approval & No Automatic Substitution Validator
+    async validateLanguageApproval({ generationId, requiredLanguages = [] }) {
+        const gen = await this.getGeneration(generationId);
+        if (!gen) return { valid: false, error: 'AI Template Generation record not found' };
+
+        const missingOrUnapproved = [];
+        for (const rawLang of requiredLanguages) {
+            const lang = this.normalizeLanguage(rawLang);
+            const variant = gen.variants.find(v => this.normalizeLanguage(v.language) === lang);
+            if (!variant) {
+                missingOrUnapproved.push({
+                    language: lang,
+                    status: 'MISSING_TRANSLATION',
+                    message: `No translation generated for ${lang}`
+                });
+            } else if (variant.approvalStatus !== 'APPROVED') {
+                missingOrUnapproved.push({
+                    language: lang,
+                    status: 'PENDING_APPROVAL',
+                    variantId: variant.id,
+                    message: `Translation for ${lang} has not been approved by administrator`
+                });
+            }
+        }
+
+        if (missingOrUnapproved.length > 0) {
+            return {
+                valid: false,
+                missingOrUnapproved,
+                error: `Content approval required: Language version(s) [${missingOrUnapproved.map(m => m.language).join(', ')}] are not approved. Automatic substitution is strictly disabled.`
+            };
+        }
+
+        return { valid: true };
     }
 
     // Step 6 — Variant Approval

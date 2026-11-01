@@ -1,6 +1,63 @@
 {
   "notifications": [
     {
+      "id": "notif_1793536225671_6c2af6ad",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Royal Silk Sarees - TAMIL Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793536224572,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793536224572",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:30:25.671Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793536224572,
+        "sentCount": 0
+      }
+    },
+    {
+      "id": "notif_1793536199954_a2770344",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Royal Silk Sarees - TAMIL Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793536197772,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793536197772",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:29:59.954Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793536197772,
+        "sentCount": 0
+      }
+    },
+    {
+      "id": "notif_1793536199138_a9e7a986",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Phase 16 Verified Media Campaign\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793534666405,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793534666405",
+      "isRead": false,
+      "createdAt": "2026-11-01T12:29:59.138Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793534666405,
+        "sentCount": 0
+      }
+    },
+    {
       "id": "notif_1793534702029_ecfce9a6",
       "userId": "admin",
       "type": "success",

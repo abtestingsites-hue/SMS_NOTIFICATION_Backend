@@ -70,6 +70,45 @@ class DataManager {
         }).catch(console.error));
     }
 
+    async updateCustomerLanguage(idOrPhone, language) {
+        let updatedCustomer = null;
+        await (this.locks.cust = this.locks.cust.then(async () => {
+            const db = await this._readRaw(CUST_PATH);
+            if (!db.customers) db.customers = [];
+            const customer = db.customers.find(c => String(c.id) === String(idOrPhone) || String(c.phone) === String(idOrPhone));
+            if (customer) {
+                customer.language = language;
+                updatedCustomer = customer;
+                await this._writeRaw(CUST_PATH, db);
+            }
+        }).catch(console.error));
+        return updatedCustomer;
+    }
+
+    async updateSegmentLanguage(segmentName, language) {
+        let updatedCount = 0;
+        await (this.locks.cust = this.locks.cust.then(async () => {
+            const db = await this._readRaw(CUST_PATH);
+            if (!db.customers) db.customers = [];
+            const segUpper = String(segmentName || 'All').toUpperCase();
+            db.customers.forEach(c => {
+                const g = String(c.gender || c.category || '').toUpperCase();
+                const matches = (segUpper === 'ALL') ||
+                    (segUpper === 'MEN' && (g === 'MEN' || g === 'MALE')) ||
+                    (segUpper === 'WOMEN' && (g === 'WOMEN' || g === 'FEMALE')) ||
+                    (g === segUpper);
+                if (matches) {
+                    c.language = language;
+                    updatedCount++;
+                }
+            });
+            if (updatedCount > 0) {
+                await this._writeRaw(CUST_PATH, db);
+            }
+        }).catch(console.error));
+        return updatedCount;
+    }
+
     async resetCustomerHistory(phone) {
         await (this.locks.cust = this.locks.cust.then(async () => {
             const db = await this._readRaw(CUST_PATH);
