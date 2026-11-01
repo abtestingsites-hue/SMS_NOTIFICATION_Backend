@@ -1,6 +1,57 @@
 {
   "notifications": [
     {
+      "id": "notif_1793532500639_e8832b31",
+      "userId": "admin",
+      "type": "success",
+      "category": "SYSTEM",
+      "title": "Scheduled Broadcast Executed",
+      "message": "Scheduled broadcast \"Phase 13 Resilience Dispatch\" executed successfully. Dispatched: 0.",
+      "relatedEntityType": "schedule",
+      "relatedEntityId": "sch_1793532500614_o6lg",
+      "actionUrl": "scheduler",
+      "idempotencyKey": "schedule_completed_sch_1793532500614_o6lg_1793532500639",
+      "isRead": false,
+      "createdAt": "2026-11-01T11:28:20.640Z",
+      "readAt": null,
+      "metadata": {}
+    },
+    {
+      "id": "notif_1793532500464_420d6d46",
+      "userId": "admin",
+      "type": "warning",
+      "category": "GOVERNANCE",
+      "title": "Customer Opt-Out Recorded",
+      "message": "Recipient +19998887777 sent opt-out keyword \"STOP\". Added to suppression registry.",
+      "relatedEntityType": "suppression",
+      "relatedEntityId": "+19998887777",
+      "actionUrl": "settings",
+      "idempotencyKey": "optout_+19998887777_SM_optout_test_1793532500452",
+      "isRead": false,
+      "createdAt": "2026-11-01T11:28:20.464Z",
+      "readAt": null,
+      "metadata": {
+        "phone": "+19998887777",
+        "channel": "sms"
+      }
+    },
+    {
+      "id": "notif_1793532480029_0fdff00f",
+      "userId": "admin",
+      "type": "warning",
+      "category": "CAMPAIGN",
+      "title": "Rate Limit Warning",
+      "message": "Approaching daily threshold",
+      "relatedEntityType": null,
+      "relatedEntityId": null,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "notif_test_1793532480028",
+      "isRead": true,
+      "createdAt": "2026-11-01T11:28:00.029Z",
+      "readAt": "2026-11-01T11:28:00.032Z",
+      "metadata": {}
+    },
+    {
       "id": "notif_1793521251383_177e6a6f",
       "userId": "admin",
       "type": "success",

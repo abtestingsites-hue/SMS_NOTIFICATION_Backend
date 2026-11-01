@@ -79,8 +79,31 @@ class QueueSimulator {
         return `Hi ${customerName}: ${title}! Get ${disc} with code ${code}. Valid until ${expiry}. Visit our store today!`;
     }
 
+
+    getPublicMediaUrl(mediaAsset) {
+        if (!mediaAsset) return null;
+        if (mediaAsset.assetStreamUrl && mediaAsset.assetStreamUrl.startsWith('http')) {
+            return mediaAsset.assetStreamUrl;
+        }
+        const publicBase = process.env.PUBLIC_MEDIA_URL_BASE || process.env.RENDER_EXTERNAL_URL || process.env.BASE_URL;
+        if (publicBase) {
+            return `${publicBase.replace(/\/$/, '')}/api/media/asset/${mediaAsset.id}`;
+        }
+        return `http://127.0.0.1:${process.env.PORT || 3000}/api/media/asset/${mediaAsset.id}`;
+    }
+
+    getTrackedMediaUrl(mediaAsset, campaignId = null) {
+        if (!mediaAsset) return '';
+        const publicBase = process.env.PUBLIC_MEDIA_URL_BASE || process.env.RENDER_EXTERNAL_URL || process.env.BASE_URL || '';
+        const qs = campaignId ? `?c=${campaignId}` : '';
+        if (publicBase) {
+            return `${publicBase.replace(/\/$/, '')}/api/m/${mediaAsset.id}${qs}`;
+        }
+        return `http://127.0.0.1:${process.env.PORT || 3000}/api/m/${mediaAsset.id}${qs}`;
+    }
+
     // Core Dual Platform Dispatcher: Sends via WhatsApp AND/OR Cellular SMS
-    async dispatchDualChannel({ to, body, smsBody = null, platform = 'both' }) {
+    async dispatchDualChannel({ to, body, smsBody = null, platform = 'both', mediaAsset = null, campaignId = null }) {
         const rawPhone = this.normalizeNumber(to);
         if (!rawPhone) {
             return {
@@ -100,13 +123,17 @@ class QueueSimulator {
             sms: { attempted: false, sent: false, sid: null, error: null, code: null }
         };
 
-        if (!client) {
-            console.log(`[Simulate Dual] (${platform}) To: ${rawPhone}\nBody:\n${body}`);
+                if (!client) {
+            let simSmsBody = smsBody || body;
+            if (mediaAsset) {
+                simSmsBody += `\nMedia: ${this.getTrackedMediaUrl(mediaAsset, campaignId)}`;
+            }
+            console.log(`[Simulate Dual] (${platform}) To: ${rawPhone}\nBody:\n${body}\nMedia: ${mediaAsset ? mediaAsset.id : 'none'}`);
             return {
                 success: true,
                 simulated: true,
-                whatsapp: { attempted: platform !== 'sms', sent: platform !== 'sms', sid: 'SIM_WA_' + Date.now() },
-                sms: { attempted: platform !== 'whatsapp', sent: platform !== 'whatsapp', sid: 'SIM_SMS_' + Date.now() },
+                whatsapp: { attempted: platform !== 'sms', sent: platform !== 'sms', sid: 'SIM_WA_' + Date.now(), mediaUrl: mediaAsset ? [this.getPublicMediaUrl(mediaAsset)] : undefined },
+                sms: { attempted: platform !== 'whatsapp', sent: platform !== 'whatsapp', sid: 'SIM_SMS_' + Date.now(), text: simSmsBody },
                 body
             };
         }
@@ -117,11 +144,18 @@ class QueueSimulator {
             try {
                 const waTo = `whatsapp:${rawPhone}`;
                 console.log(`[WhatsApp] Dispatching Campaign Message to ${waTo} from ${waFrom}...`);
-                const msg = await client.messages.create({
+                const waPayload = {
                     body: body,
                     from: waFrom,
                     to: waTo
-                });
+                };
+                if (mediaAsset) {
+                    const publicMediaUrl = this.getPublicMediaUrl(mediaAsset);
+                    if (publicMediaUrl) {
+                        waPayload.mediaUrl = [publicMediaUrl];
+                    }
+                }
+                const msg = await client.messages.create(waPayload);
                 results.whatsapp.sent = true;
                 results.whatsapp.sid = msg.sid;
                 console.log(`✅ [WhatsApp] Delivered to ${waTo}: ${msg.sid}`);
@@ -145,9 +179,13 @@ class QueueSimulator {
                         .replace(/[*_~`]/g, '')
                         .replace(/\s+/g, ' ')
                         .trim();
-                    if (textForSms.length > 140) {
-                        textForSms = textForSms.slice(0, 137) + '...';
+                    if (textForSms.length > 120) {
+                        textForSms = textForSms.slice(0, 117) + '...';
                     }
+                }
+                if (mediaAsset) {
+                    const trackedLink = this.getTrackedMediaUrl(mediaAsset, campaignId);
+                    textForSms += `\nMedia: ${trackedLink}`;
                 }
                 console.log(`[Cellular SMS] Dispatching Campaign Message to ${smsTo} from ${smsFrom}...`);
                 const msg = await client.messages.create({
@@ -173,22 +211,32 @@ class QueueSimulator {
         try {
             if (results.whatsapp.attempted) {
                 await dispatchTelemetryService.recordDispatch({
+                    campaignId,
                     channel: 'whatsapp',
                     recipient: rawPhone,
                     sid: results.whatsapp.sid,
                     status: results.whatsapp.sent ? 'sent' : 'failed',
                     errorCode: results.whatsapp.code,
-                    errorMessage: results.whatsapp.error
+                    errorMessage: results.whatsapp.error,
+                    hasMedia: Boolean(mediaAsset),
+                    mediaId: mediaAsset?.id || null,
+                    mediaType: mediaAsset?.mediaType || null,
+                    mediaUrl: mediaAsset ? this.getPublicMediaUrl(mediaAsset) : null
                 });
             }
             if (results.sms.attempted) {
                 await dispatchTelemetryService.recordDispatch({
+                    campaignId,
                     channel: 'sms',
                     recipient: rawPhone,
                     sid: results.sms.sid,
                     status: results.sms.sent ? 'sent' : 'failed',
                     errorCode: results.sms.code,
-                    errorMessage: results.sms.error
+                    errorMessage: results.sms.error,
+                    hasMedia: Boolean(mediaAsset),
+                    mediaId: mediaAsset?.id || null,
+                    mediaType: mediaAsset?.mediaType || null,
+                    mediaUrl: mediaAsset ? this.getTrackedMediaUrl(mediaAsset, campaignId) : null
                 });
             }
         } catch (e) {
@@ -354,7 +402,9 @@ class QueueSimulator {
                                 campaign.template || null,
                                 campaign.validUntil,
                                 isEmergency,
-                                platform
+                                platform,
+                                campaign.mediaAsset || null,
+                                campaign.id
                             );
 
                             if (success) {
@@ -411,7 +461,7 @@ class QueueSimulator {
         }
     }
 
-    async simulateWhatsAppSend(customer, offer, legacyTemplate, validUntil, isEmergency = false, platform = 'both') {
+    async simulateWhatsAppSend(customer, offer, legacyTemplate, validUntil, isEmergency = false, platform = 'both', mediaAsset = null, campaignId = null) {
         const rawPhone = this.normalizeNumber(customer.phone);
         if (!rawPhone) return false;
 
@@ -464,7 +514,9 @@ class QueueSimulator {
                 to: rawPhone,
                 body: body,
                 smsBody: smsBody,
-                platform: platform
+                platform: platform,
+                mediaAsset: mediaAsset,
+                campaignId: campaignId
             });
 
             return result.success;

@@ -159,6 +159,18 @@ class MediaService {
             }
         }
     }
+
+    async verifyAssetExists(id) {
+        const item = await this.getById(id);
+        if (!item) return { exists: false, reason: 'Record not found in media database' };
+        const filePath = path.join(MEDIA_DIR, item.filename);
+        try {
+            await fs.access(filePath);
+            return { exists: true, asset: item, filePath };
+        } catch (e) {
+            return { exists: false, reason: 'Media file missing from disk storage', asset: item };
+        }
+    }
 }
 
 module.exports = new MediaService();

@@ -221,6 +221,86 @@
       "customerCareNumber": "+916369825386",
       "sendToCustomerCare": true,
       "customerCareNotified": true
+    },
+    {
+      "id": 1793531744075,
+      "name": "Phase 16 Media Broadcast",
+      "status": "SCHEDULED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T11:15:44.075Z",
+      "scheduledFor": "2026-11-02T11:15:44.075Z",
+      "validUntil": "2026-12-31",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{1}} 👋\n\n✨ *Exclusive Offer Just for You!* ✨\n\n{{2}}\n\n⏰ *Offer Valid Until:* {{3}}\n\nVisit our store and grab your favorite styles before time runs out.\nCome and get it soon! 🛍️🔥\n\n",
+      "mediaId": "med_1793528408466_st6wz",
+      "mediaAsset": {
+        "id": "med_1793528408466_st6wz",
+        "filename": "asset-1793528408458-959519541.jpg",
+        "originalName": "acd2659ac64f64923184bbfadba00e04.jpg",
+        "mimeType": "image/jpeg",
+        "mediaType": "image",
+        "size": 62448,
+        "checksum": "4cd2182ce08da07f912d221534fd785438466e94ea185c9cfb0cb6ae84bf6287",
+        "storageDriver": "DURABLE_OBJECT_STORAGE",
+        "magicBytesVerified": true,
+        "url": "/uploads/media/asset-1793528408458-959519541.jpg",
+        "assetStreamUrl": "/api/media/asset/med_1793528408466_st6wz",
+        "uploadedAt": "2026-11-01T10:20:08.466Z",
+        "caption": "TV Add",
+        "tags": [
+          "Summer50"
+        ],
+        "references": []
+      },
+      "mediaEnabled": true,
+      "mediaType": "image",
+      "customerCareNumber": "+91 6369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": false
+    },
+    {
+      "id": 1793532466870,
+      "name": "Phase 16 Verified Media Campaign",
+      "status": "SCHEDULED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T11:27:46.870Z",
+      "scheduledFor": "2026-11-03T11:27:46.870Z",
+      "validUntil": "2026-12-31",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Exclusive Flash Sale: {{2}}! Valid until {{3}}",
+      "mediaId": "med_1793532466837_e1pij",
+      "mediaAsset": {
+        "id": "med_1793532466837_e1pij",
+        "filename": "asset_test_phase16_1793532466833.jpg",
+        "originalName": "Phase16_Banner.jpg",
+        "mimeType": "image/jpeg",
+        "mediaType": "image",
+        "size": 22,
+        "checksum": "473715a932e74c8d8588b2c53587f16ddbdb5ec86a0b55d05207bb08d818df14",
+        "storageDriver": "DURABLE_OBJECT_STORAGE",
+        "magicBytesVerified": true,
+        "url": "/uploads/media/asset_test_phase16_1793532466833.jpg",
+        "assetStreamUrl": "/api/media/asset/med_1793532466837_e1pij",
+        "uploadedAt": "2026-11-01T11:27:46.837Z",
+        "caption": "Phase 16 Test Creative",
+        "tags": [
+          "Phase16",
+          "Autumn"
+        ],
+        "references": [
+          "template:active",
+          "template:Diwali Festive Mega Offer"
+        ]
+      },
+      "mediaEnabled": true,
+      "mediaType": "image",
+      "customerCareNumber": "+91 6369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": false
     }
   ],
   "offers": [
@@ -285,11 +365,34 @@
       "description": "Last chance closing sale"
     }
   ],
-  "template": "Hi {{1}} 👋\n\n✨ *Exclusive Offer Just for You!* ✨\n\n{{2}}\n\n⏰ *Offer Valid Until:* {{3}}\n\nVisit our store and grab your favorite styles before time runs out.\nCome and get it soon! 🛍️🔥\n\n",
+  "template": "Exclusive Flash Sale: {{2}}! Valid until {{3}}",
   "settings": {
     "customerCareNumber": "+91 6369825386",
     "sendToCustomerCare": true,
     "sendToCarePerCustomer": false,
     "platform": "both"
-  }
+  },
+  "templateMediaId": "med_1793532466837_e1pij",
+  "templateMedia": {
+    "id": "med_1793532466837_e1pij",
+    "filename": "asset_test_phase16_1793532466833.jpg",
+    "originalName": "Phase16_Banner.jpg",
+    "mimeType": "image/jpeg",
+    "mediaType": "image",
+    "size": 22,
+    "checksum": "473715a932e74c8d8588b2c53587f16ddbdb5ec86a0b55d05207bb08d818df14",
+    "storageDriver": "DURABLE_OBJECT_STORAGE",
+    "magicBytesVerified": true,
+    "url": "/uploads/media/asset_test_phase16_1793532466833.jpg",
+    "assetStreamUrl": "/api/media/asset/med_1793532466837_e1pij",
+    "uploadedAt": "2026-11-01T11:27:46.837Z",
+    "caption": "Phase 16 Test Creative",
+    "tags": [
+      "Phase16",
+      "Autumn"
+    ],
+    "references": []
+  },
+  "templateChannel": "both",
+  "templatesList": []
 }

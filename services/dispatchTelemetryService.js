@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const DISPATCHES_FILE = path.join(__dirname, '..', 'data', 'dispatches.json');
+const MEDIA_CLICKS_FILE = path.join(__dirname, '..', 'data', 'media_clicks.json');
 
 class DispatchTelemetryService {
     constructor() {
@@ -28,6 +29,46 @@ class DispatchTelemetryService {
         }
     }
 
+
+    async _readClicks() {
+        try {
+            const data = await fs.readFile(MEDIA_CLICKS_FILE, 'utf8');
+            return JSON.parse(data);
+        } catch {
+            return [];
+        }
+    }
+
+    async _writeClicks(clicks) {
+        await fs.writeFile(MEDIA_CLICKS_FILE, JSON.stringify(clicks, null, 2), 'utf8');
+    }
+
+    async recordMediaClick({ mediaId, recipient = null, campaignId = null, userAgent = null, ip = null }) {
+        await this.init();
+        return await (this.lock = this.lock.then(async () => {
+            const clicks = await this._readClicks();
+            const clickRecord = {
+                id: 'clk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                mediaId: String(mediaId),
+                recipient: recipient || null,
+                campaignId: campaignId ? String(campaignId) : null,
+                userAgent: userAgent || null,
+                ip: ip || null,
+                clickedAt: new Date().toISOString()
+            };
+            clicks.unshift(clickRecord);
+            await this._writeClicks(clicks);
+            return clickRecord;
+        }));
+    }
+
+    async getMediaClicks(mediaId = null) {
+        await this.init();
+        const clicks = await this._readClicks();
+        if (!mediaId) return clicks;
+        return clicks.filter(c => String(c.mediaId) === String(mediaId));
+    }
+
     async _writeDispatches(dispatches) {
         await fs.writeFile(DISPATCHES_FILE, JSON.stringify(dispatches, null, 2), 'utf8');
     }
@@ -41,6 +82,10 @@ class DispatchTelemetryService {
         status = 'queued',
         errorCode = null,
         errorMessage = null,
+        hasMedia = false,
+        mediaId = null,
+        mediaType = null,
+        mediaUrl = null,
         metadata = {}
     }) {
         await this.init();
@@ -69,6 +114,10 @@ class DispatchTelemetryService {
                 errorMessage: errorMessage || null,
                 callbackCount: 0,
                 lastCallbackAt: null,
+                hasMedia: Boolean(hasMedia || mediaId),
+                mediaId: mediaId || null,
+                mediaType: mediaType || null,
+                mediaUrl: mediaUrl || null,
                 metadata: metadata || {}
             };
 
@@ -211,6 +260,25 @@ class DispatchTelemetryService {
         const waStats = calculateChannelStats(waRecords);
         const totalStats = calculateChannelStats(filtered);
 
+
+        // 4. Media Campaign Performance Stats
+        const mediaRecords = filtered.filter(d => d.hasMedia || d.mediaId);
+        const mediaClicks = await this.getMediaClicks();
+        const mediaClicksFiltered = cutoff > 0
+            ? mediaClicks.filter(c => new Date(c.clickedAt).getTime() >= cutoff)
+            : mediaClicks;
+
+        const mediaStats = {
+            totalDispatches: mediaRecords.length,
+            smsDispatches: mediaRecords.filter(d => d.channel === 'sms').length,
+            whatsappDispatches: mediaRecords.filter(d => d.channel === 'whatsapp').length,
+            delivered: mediaRecords.filter(d => d.status === 'delivered').length,
+            failed: mediaRecords.filter(d => ['failed', 'undelivered'].includes(d.status)).length,
+            pending: mediaRecords.filter(d => ['queued', 'accepted', 'sending', 'sent'].includes(d.status)).length,
+            clicks: mediaClicksFiltered.length,
+            clickThroughRate: mediaRecords.length > 0 ? Math.min(100, Math.round((mediaClicksFiltered.length / mediaRecords.length) * 100)) : 0
+        };
+
         // 3. Timeline Aggregation (Ensuring Chart Totals strictly match KPI Totals)
         const timeline = this.buildTimelineAggregation(filtered, granularity);
 
@@ -220,6 +288,7 @@ class DispatchTelemetryService {
             total: totalStats,
             sms: smsStats,
             whatsapp: waStats,
+            mediaStats,
             timeline,
             recordCount: filtered.length
         };

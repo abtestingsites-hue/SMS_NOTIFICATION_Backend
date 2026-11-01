@@ -250,7 +250,12 @@ app.post('/api/settings', async (req, res) => {
 // Send SINGLE Message Endpoint: Targets only 1 recipient (preserves trial quota)
 app.post('/api/sms/send-single', async (req, res) => {
     try {
-        const { recipient, platform = 'both', template, recipientName = 'Akash', offerCode } = req.body;
+        const { recipient, platform = 'both', template, recipientName = 'Akash', offerCode, mediaId } = req.body;
+        let singleMediaAsset = null;
+        if (mediaId) {
+            const check = await mediaService.verifyAssetExists(mediaId);
+            if (check.exists) singleMediaAsset = check.asset;
+        }
         const targetNumber = recipient || process.env.CUSTOMER_CARE_NUMBER || '+919363341709';
 
         // Customer governance check
@@ -286,7 +291,8 @@ app.post('/api/sms/send-single', async (req, res) => {
             to: targetNumber,
             body: body,
             smsBody: smsBody,
-            platform: platform
+            platform: platform,
+            mediaAsset: singleMediaAsset
         });
 
         const waSent = result.whatsapp?.sent;
@@ -367,11 +373,33 @@ app.post('/api/campaigns/start', async (req, res) => {
         customerCareNumber,
         sendToCustomerCare = true,
         platform = 'both',
-        template
+        template,
+        mediaId,
+        mediaAsset
     } = req.body;
 
+    let campaignMediaAsset = mediaAsset || null;
+    let campaignMediaId = mediaId || null;
+
+    // Pre-flight media verification: verify disk existence and accessibility
+    if (campaignMediaId) {
+        const check = await mediaService.verifyAssetExists(campaignMediaId);
+        if (!check.exists) {
+            return res.status(422).json({
+                error: `Pre-flight validation failed: Media asset ${campaignMediaId} is unavailable (${check.reason || 'Not found'})`
+            });
+        }
+        campaignMediaAsset = check.asset;
+        await mediaService.addReference(campaignMediaId, `campaign:${name || 'active'}`);
+    }
+
     if (template) {
-        await DataManager.saveTemplate(template);
+        await DataManager.saveTemplate({
+            template,
+            mediaId: campaignMediaId,
+            mediaAsset: campaignMediaAsset,
+            channel: platform || 'both'
+        });
     }
 
     const settings = await DataManager.getSettings();
@@ -394,6 +422,10 @@ app.post('/api/campaigns/start', async (req, res) => {
         targetAudience: targetAudience,
         platform: platform || settings.platform || 'both',
         template: template || (await DataManager.getTemplate()),
+        mediaId: campaignMediaId,
+        mediaAsset: campaignMediaAsset,
+        mediaEnabled: Boolean(campaignMediaId),
+        mediaType: campaignMediaAsset?.mediaType || null,
         customerCareNumber: effectiveCareNumber,
         sendToCustomerCare: Boolean(sendToCustomerCare),
         customerCareNotified: false
@@ -429,15 +461,116 @@ app.get('/api/campaigns/:id', async (req, res) => {
 
 // Template Management
 app.get('/api/template', async (req, res) => {
-    const template = await DataManager.getTemplate();
-    res.json({ template });
+    try {
+        const config = await DataManager.getTemplateConfig();
+        res.json(config);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.post('/api/template', async (req, res) => {
-    const { template } = req.body;
-    if (!template) return res.status(400).json({ error: 'Template is required' });
-    await DataManager.saveTemplate(template);
-    res.json({ message: 'Template saved', template });
+    try {
+        const { template, mediaId, mediaAsset, channel } = req.body;
+        if (template === undefined && !mediaId) {
+            return res.status(400).json({ error: 'Template content or media is required' });
+        }
+
+        let resolvedAsset = mediaAsset || null;
+        if (mediaId && !resolvedAsset) {
+            resolvedAsset = await mediaService.getById(mediaId);
+        }
+        if (mediaId) {
+            await mediaService.addReference(mediaId, 'template:active');
+        }
+
+        const saved = await DataManager.saveTemplate({
+            template: template !== undefined ? template : '',
+            mediaId: mediaId || null,
+            mediaAsset: resolvedAsset,
+            channel: channel || 'both'
+        });
+
+        res.json({
+            message: 'Template saved',
+            template: saved.template,
+            mediaId: saved.mediaId,
+            mediaAsset: saved.mediaAsset,
+            channel: saved.channel
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reusable Saved Templates Management
+app.get('/api/templates/saved', async (req, res) => {
+    try {
+        const templates = await DataManager.getSavedTemplates();
+        res.json(templates);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/templates/saved', async (req, res) => {
+    try {
+        const { id, name, body, template, channel, mediaId, mediaAsset, category } = req.body;
+        let resolvedAsset = mediaAsset || null;
+        if (mediaId && !resolvedAsset) {
+            resolvedAsset = await mediaService.getById(mediaId);
+        }
+        if (mediaId) {
+            await mediaService.addReference(mediaId, `template:${name || 'saved'}`);
+        }
+        const record = await DataManager.saveTemplateItem({
+            id,
+            name,
+            body: body || template || '',
+            channel: channel || 'both',
+            mediaId: mediaId || null,
+            mediaAsset: resolvedAsset,
+            category: category || 'General'
+        });
+        res.json({ message: 'Template saved successfully', template: record });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/templates/saved/:id', async (req, res) => {
+    try {
+        const deleted = await DataManager.deleteSavedTemplate(req.params.id);
+        if (!deleted) return res.status(404).json({ error: 'Saved template not found' });
+        res.json({ message: 'Saved template deleted', id: req.params.id });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Tracked Media Redirect for SMS & Click Telemetry
+app.get(['/api/m/:id', '/api/media/track/:id'], async (req, res) => {
+    try {
+        const mediaId = req.params.id;
+        const asset = await mediaService.getById(mediaId);
+        if (!asset) return res.status(404).send('Media not found');
+
+        try {
+            await dispatchTelemetryService.recordMediaClick({
+                mediaId,
+                recipient: req.query.r || null,
+                campaignId: req.query.c || null,
+                userAgent: req.headers['user-agent'] || 'unknown',
+                ip: req.ip || req.headers['x-forwarded-for'] || 'unknown'
+            });
+        } catch (e) {
+            console.warn('[Telemetry MediaClick Warning]', e.message);
+        }
+
+        res.redirect(302, `/api/media/asset/${mediaId}`);
+    } catch (err) {
+        res.status(500).send('Redirection error: ' + err.message);
+    }
 });
 
 

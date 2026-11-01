@@ -1,6 +1,39 @@
 {
   "schedules": [
     {
+      "id": "sch_1793532500614_o6lg",
+      "name": "Phase 13 Resilience Dispatch",
+      "type": "ONCE",
+      "scheduledAt": "2026-11-01T11:28:15.612Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{1}}, special update from SMS Campaign System!",
+      "offerCode": "SUMMER25",
+      "mediaId": null,
+      "idempotencyKey": "idemp_500a3823f576601308bccb1c",
+      "status": "COMPLETED",
+      "createdAt": "2026-11-01T11:28:20.614Z",
+      "lastRunAt": "2026-11-01T11:28:20.619Z",
+      "executionCount": 1,
+      "logs": [
+        {
+          "timestamp": "2026-11-01T11:28:20.638Z",
+          "event": "EXECUTED",
+          "details": "Dispatched to 0 recipients (17 suppressed by governance)"
+        },
+        {
+          "timestamp": "2026-11-01T11:28:20.614Z",
+          "event": "SCHEDULED",
+          "details": "Scheduled for 2026-11-01T11:28:15.612Z"
+        }
+      ],
+      "lockedBy": null,
+      "lockedAt": null,
+      "lockExpiresAt": null,
+      "retryCount": 0
+    },
+    {
       "id": "sch_1793526835295",
       "name": "Weekend VIP Flash Sale",
       "type": "WEEKLY",

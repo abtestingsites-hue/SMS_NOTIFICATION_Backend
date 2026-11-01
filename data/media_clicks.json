@@ -1,0 +1,29 @@
+[
+  {
+    "id": "clk_1793532466877_5iav2",
+    "mediaId": "med_1793532466837_e1pij",
+    "recipient": "+919840123450",
+    "campaignId": "1793532466870",
+    "userAgent": "unknown",
+    "ip": "127.0.0.1",
+    "clickedAt": "2026-11-01T11:27:46.877Z"
+  },
+  {
+    "id": "clk_1793531744041_b0plw",
+    "mediaId": "med_1793528408466_st6wz",
+    "recipient": null,
+    "campaignId": null,
+    "userAgent": "unknown",
+    "ip": "127.0.0.1",
+    "clickedAt": "2026-11-01T11:15:44.041Z"
+  },
+  {
+    "id": "clk_1793531641364_38jyj",
+    "mediaId": "med_1793528408466_st6wz",
+    "recipient": null,
+    "campaignId": null,
+    "userAgent": "unknown",
+    "ip": "127.0.0.1",
+    "clickedAt": "2026-11-01T11:14:01.365Z"
+  }
+]

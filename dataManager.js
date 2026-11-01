@@ -173,11 +173,80 @@ class DataManager {
         return db.template || "";
     }
 
-    async saveTemplate(template) {
+    async getTemplateConfig() {
         const db = await this._getMainDB();
-        db.template = template;
+        return {
+            template: db.template || "",
+            mediaId: db.templateMediaId || null,
+            mediaAsset: db.templateMedia || null,
+            channel: db.templateChannel || 'both'
+        };
+    }
+
+    async saveTemplate(payload) {
+        const db = await this._getMainDB();
+        if (typeof payload === 'string') {
+            db.template = payload;
+        } else if (payload && typeof payload === 'object') {
+            if (payload.template !== undefined) db.template = payload.template;
+            db.templateMediaId = payload.mediaId !== undefined ? payload.mediaId : db.templateMediaId || null;
+            db.templateMedia = payload.mediaAsset !== undefined ? payload.mediaAsset : db.templateMedia || null;
+            db.templateChannel = payload.channel !== undefined ? payload.channel : (db.templateChannel || 'both');
+        }
         await this._saveMainDB(db);
-        return db.template;
+        return {
+            template: db.template || "",
+            mediaId: db.templateMediaId || null,
+            mediaAsset: db.templateMedia || null,
+            channel: db.templateChannel || 'both'
+        };
+    }
+
+    async getSavedTemplates() {
+        const db = await this._getMainDB();
+        return db.templatesList || [];
+    }
+
+    async saveTemplateItem(item) {
+        const db = await this._getMainDB();
+        if (!db.templatesList) db.templatesList = [];
+
+        const now = new Date().toISOString();
+        const id = item.id || `tpl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const existingIdx = db.templatesList.findIndex(t => String(t.id) === String(id));
+
+        const record = {
+            id,
+            name: item.name || 'Marketing Template',
+            body: item.body || item.template || '',
+            channel: item.channel || 'both',
+            mediaId: item.mediaId || null,
+            mediaAsset: item.mediaAsset || null,
+            category: item.category || 'General',
+            createdAt: existingIdx >= 0 ? db.templatesList[existingIdx].createdAt : now,
+            updatedAt: now
+        };
+
+        if (existingIdx >= 0) {
+            db.templatesList[existingIdx] = record;
+        } else {
+            db.templatesList.unshift(record);
+        }
+
+        await this._saveMainDB(db);
+        return record;
+    }
+
+    async deleteSavedTemplate(id) {
+        const db = await this._getMainDB();
+        if (!db.templatesList) return false;
+        const initialLen = db.templatesList.length;
+        db.templatesList = db.templatesList.filter(t => String(t.id) !== String(id));
+        if (db.templatesList.length !== initialLen) {
+            await this._saveMainDB(db);
+            return true;
+        }
+        return false;
     }
 
     // --- Settings & Dual Platform Configuration ---
