@@ -10,6 +10,7 @@ node_modules/
 uploads/
 logs/
 *.log
+data/backups/
 
 # OS & Editor Files
 .DS_Store
