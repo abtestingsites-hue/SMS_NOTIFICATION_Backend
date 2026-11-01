@@ -102,8 +102,11 @@ async function runPhase17Tests() {
     const res1 = await makeRequest('POST', '/api/ai-templates/analyze-image', analyzePayload);
     assert(res1.status === 200, 'Test 1: Image Analysis Endpoint Returns 200 OK');
     assert(res1.data.extractedOfferData !== undefined, 'Test 2a: Extracted Offer Data Object Exists');
-    assert(res1.data.extractedOfferData.discount === '50% OFF' || res1.data.extractedOfferData.discount.includes('50'), 'Test 2b: Accurate Discount Extraction (50%)');
-    assert(res1.data.extractedOfferData.couponCode === 'DIWALI50', 'Test 2c: Accurate Coupon Code Extraction (DIWALI50)');
+    const getVal = f => (f && typeof f === 'object' && 'value' in f ? f.value : f);
+    const dVal = getVal(res1.data.extractedOfferData.discount);
+    const cVal = getVal(res1.data.extractedOfferData.couponCode);
+    assert(dVal === '50% OFF' || (dVal && dVal.includes('50')), 'Test 2b: Accurate Discount Extraction (50%)');
+    assert(cVal === 'DIWALI50', 'Test 2c: Accurate Coupon Code Extraction (DIWALI50)');
 
     // -------------------------------------------------------------
     // TEST 3: Anti-Hallucination Guarantee (Unstated Fields Flagged)
@@ -114,9 +117,10 @@ async function runPhase17Tests() {
     };
     const res3 = await makeRequest('POST', '/api/ai-templates/analyze-image', analyzeVague);
     assert(res3.status === 200, 'Test 3a: Analyzed Creative without Explicit Code Returns 200');
+    const cVal3 = getVal(res3.data.extractedOfferData.couponCode);
     assert(
       res3.data.extractedOfferData.needsConfirmation &&
-      (res3.data.extractedOfferData.needsConfirmation.includes('couponCode') || res3.data.extractedOfferData.couponCode === ''),
+      (res3.data.extractedOfferData.needsConfirmation.includes('couponCode') || !cVal3),
       'Test 3b: System NEVER Invents a Coupon Code When Not Present',
       JSON.stringify(res3.data.extractedOfferData)
     );

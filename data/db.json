@@ -453,6 +453,50 @@
       "customerCareNumber": "+916369825386",
       "sendToCustomerCare": true,
       "customerCareNotified": true
+    },
+    {
+      "id": 1793538482580,
+      "name": "Sony Bravia Tamil Festive Blitz",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T13:08:02.580Z",
+      "scheduledFor": "2026-11-01T13:08:02.580Z",
+      "validUntil": "15 Aug 2026",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "வணக்கம் {{customer_name}}! Sony-ன் Bravia 4K Smart TV மீது Festive Flash Deal மூலம் 35% Flat Off பெறுங்கள். இந்த ஆஃபர் 15 Aug 2026 வரை மட்டுமே செல்லுபடியாகும். தொடர்புக்கு: +916369825386. Standard T&C apply.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "language": "tamil",
+      "aiGenerationId": "gen_1793538434985_k79mg",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": false
+    },
+    {
+      "id": 1793538680351,
+      "name": "Royal Silk Sarees - TAMIL Broadcast",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-11-01T13:11:20.351Z",
+      "scheduledFor": "2026-11-01T13:11:20.351Z",
+      "validUntil": "2026-11-20",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Royal Silk Sarees வழங்கும் தீபாவளி ஸ்பெஷல் மெகா பிரிவிலேஜ்! காஞ்சிபுரம் சில்க் சேலை மீது 40% Flat Discount. கூப்பன் குறியீடு SILK40 பயன்படுத்தவும். 2026-11-20 வரை செல்லுபடியாகும். Shop Now & Claim Privilege: https://royalsilks.in\n\nஅவசர சலுகை!",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "language": "tamil",
+      "aiGenerationId": "gen_1793538645149_0pekj",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
     }
   ],
   "offers": [
@@ -547,6 +591,17 @@
   },
   "templateChannel": "both",
   "templatesList": [
+    {
+      "id": "tpl_1793538679094_jc5l",
+      "name": "Diwali Tamil Silk Mega Promo",
+      "body": "Royal Silk Sarees வழங்கும் தீபாவளி ஸ்பெஷல் மெகா பிரிவிலேஜ்! காஞ்சிபுரம் சில்க் சேலை மீது 40% Flat Discount. கூப்பன் குறியீடு SILK40 பயன்படுத்தவும். 2026-11-20 வரை செல்லுபடியாகும். Shop Now & Claim Privilege: https://royalsilks.in\n\nஅவசர சலுகை!",
+      "channel": "both",
+      "mediaId": null,
+      "mediaAsset": null,
+      "category": "Promotional",
+      "createdAt": "2026-11-01T13:11:19.094Z",
+      "updatedAt": "2026-11-01T13:11:19.094Z"
+    },
     {
       "id": "tpl_1793536223557_b711",
       "name": "Diwali Tamil Silk Mega Promo",

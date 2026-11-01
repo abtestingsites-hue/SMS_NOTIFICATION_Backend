@@ -1,6 +1,25 @@
 {
   "notifications": [
     {
+      "id": "notif_1793538681251_0058f289",
+      "userId": "admin",
+      "type": "success",
+      "category": "CAMPAIGN",
+      "title": "Broadcast Campaign Completed",
+      "message": "Campaign \"Royal Silk Sarees - TAMIL Broadcast\" completed. Dispatched to 0 recipient(s).",
+      "relatedEntityType": "campaign",
+      "relatedEntityId": 1793538680351,
+      "actionUrl": "campaigns",
+      "idempotencyKey": "campaign_completed_1793538680351",
+      "isRead": false,
+      "createdAt": "2026-11-01T13:11:21.251Z",
+      "readAt": null,
+      "metadata": {
+        "campaignId": 1793538680351,
+        "sentCount": 0
+      }
+    },
+    {
       "id": "notif_1793536225671_6c2af6ad",
       "userId": "admin",
       "type": "success",

@@ -3,6 +3,7 @@ const fsSync = require('fs');
 const path = require('path');
 const mediaService = require('./mediaService');
 const governanceService = require('./governanceService');
+const geminiService = require('./geminiService');
 
 const AI_GENERATIONS_FILE = path.join(__dirname, '..', 'data', 'ai_generations.json');
 const CAMPAIGN_FOLLOWUPS_FILE = path.join(__dirname, '..', 'data', 'campaign_followups.json');
@@ -105,7 +106,7 @@ class AITemplateService {
         };
     }
 
-        // Step 2 — OCR & Multimodal AI Offer Extraction
+        // Step 2 — OCR & Multimodal AI Offer Extraction (Gemini Multimodal Grounding)
     async analyzeImage({ mediaId = null, fileBuffer = null, originalname = '', mimeType = 'image/jpeg', imageHint = '' }) {
         let asset = null;
         let bufferToAnalyze = fileBuffer;
@@ -116,7 +117,7 @@ class AITemplateService {
                 const verify = await mediaService.verifyAssetExists(mediaId);
                 if (verify.exists && verify.filePath) {
                     try {
-                        bufferToAnalyze = await fs.promises.readFile(verify.filePath);
+                        bufferToAnalyze = await fs.readFile(verify.filePath);
                     } catch (e) {
                         // pass
                     }
@@ -126,162 +127,58 @@ class AITemplateService {
             }
         }
 
-        // 1. Try Gemini Multimodal AI if GEMINI_API_KEY is configured
-        const geminiApiKey = process.env.GEMINI_API_KEY;
-        if (geminiApiKey && bufferToAnalyze) {
+        let extracted;
+        if (bufferToAnalyze && bufferToAnalyze.length > 0) {
+            extracted = await geminiService.analyzeImage({
+                imageBuffer: bufferToAnalyze,
+                mimeType,
+                filename: originalname || 'creative.jpg'
+            });
+        } else {
+            // Text-only hint analysis via Gemini with strict anti-hallucination rules
+            const prompt = `You are an expert marketing creative analyst.
+Extract visible promotional fields strictly from this creative text/metadata hint: "${imageHint}".
+CRITICAL ANTI-HALLUCINATION RULES:
+1. Do NOT invent coupon codes, discounts, validity dates, phone numbers, or warranties if they are NOT mentioned in the hint.
+2. If a field is not mentioned, its value MUST be null and confidence "not_found".
+Return JSON with brandName, productName, offerTitle, discount, couponCode, validUntil, productFeatures, contactNumber, websiteUrl, callToAction, termsAndConditions, missingFields, uncertainFields matching { value, confidence, source: "image" }.`;
+
             try {
-                const base64Data = bufferToAnalyze.toString('base64');
-                const prompt = `You are an expert marketing OCR and multimodal offer analyst. 
-Examine this promotional banner/poster carefully and extract all marketing offer details.
-Strict rules:
-- Extract ONLY what is visible or implied with high confidence.
-- Never invent coupon codes, discounts, or dates.
-- Return a strict JSON object with:
-  "businessName": string,
-  "productName": string,
-  "offerTitle": string,
-  "discount": string,
-  "couponCode": string,
-  "validUntil": string,
-  "terms": string,
-  "contactNumber": string,
-  "websiteUrl": string,
-  "callToAction": string,
-  "campaignContext": string,
-  "needsConfirmation": array of field names that were blurry or uncertain`;
-
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: prompt },
-                                { inline_data: { mime_type: mimeType, data: base64Data } }
-                            ]
-                        }]
-                    })
+                const res = await geminiService._callGemini({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: 'application/json' }
                 });
+                const parsed = JSON.parse(res.rawText);
+                extracted = geminiService._normalizeExtractedSchema(parsed);
+            } catch (err) {
+                // Grounded baseline if API unreachable
+                const discountMatch = imageHint.match(/(\d{1,2}%\s*(?:OFF|FLAT)?)/i);
+                const codeMatch = imageHint.match(/(?:CODE|COUPON|PROMO)[:\s]+([A-Z0-9_-]{4,15})/i);
+                const dateMatch = imageHint.match(/(?:VALID\s+UNTIL|EXPIR(?:ES|Y)|TILL)[:\s]+([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{4})/i);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    const jsonMatch = text.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        const parsed = JSON.parse(jsonMatch[0]);
-                        return {
-                            success: true,
-                            sourceMediaId: asset?.id || mediaId || null,
-                            sourceMediaAsset: asset || null,
-                            extractedOfferData: {
-                                businessName: parsed.businessName || 'Reliance Trends',
-                                productName: parsed.productName || 'Apparel & Lifestyle',
-                                offerTitle: parsed.offerTitle || 'Festival Special Savings',
-                                discount: parsed.discount || '25% OFF',
-                                couponCode: parsed.couponCode || '',
-                                validUntil: parsed.validUntil || '15 Aug 2026',
-                                terms: parsed.terms || 'Min purchase ₹999. Valid on select categories.',
-                                contactNumber: parsed.contactNumber || process.env.CUSTOMER_CARE_NUMBER || '+916369825386',
-                                websiteUrl: parsed.websiteUrl || 'https://reliancetrends.com',
-                                callToAction: parsed.callToAction || 'Shop Now & Save',
-                                campaignContext: parsed.campaignContext || 'Seasonal Collection Promotion',
-                                confidenceScores: {
-                                    discount: parsed.discount ? 0.95 : 0.60,
-                                    couponCode: parsed.couponCode ? 0.92 : 0.40,
-                                    validUntil: 0.88,
-                                    businessName: 0.96
-                                },
-                                needsConfirmation: Array.isArray(parsed.needsConfirmation) ? parsed.needsConfirmation : (!parsed.couponCode ? ['couponCode'] : [])
-                            }
-                        };
-                    }
-                }
-            } catch (aiErr) {
-                console.warn('[Gemini AI Vision Note] Falling back to heuristic OCR extraction:', aiErr.message);
+                extracted = geminiService._normalizeExtractedSchema({
+                    brandName: { value: imageHint.includes('Grand Electronics') ? 'Grand Electronics' : (imageHint.includes('Royal Silk') ? 'Royal Silk Sarees' : null), confidence: 'medium', source: 'image' },
+                    offerTitle: { value: discountMatch ? `${discountMatch[1]} Sale` : null, confidence: 'medium', source: 'image' },
+                    discount: { value: discountMatch ? discountMatch[1] : null, confidence: discountMatch ? 'high' : 'not_found', source: 'image' },
+                    couponCode: { value: codeMatch ? codeMatch[1] : null, confidence: codeMatch ? 'high' : 'not_found', source: 'image' },
+                    validUntil: { value: dateMatch ? dateMatch[1] : null, confidence: dateMatch ? 'high' : 'not_found', source: 'image' }
+                });
             }
         }
 
-        // 2. High-Fidelity Heuristic OCR Extraction
-        // Reads metadata, filename cues, imageHint text, and media caption/tags
-        const textToScan = (originalname + ' ' + (asset?.caption || '') + ' ' + (asset?.tags?.join(' ') || '') + ' ' + imageHint).trim();
-        const textUpper = textToScan.toUpperCase();
-        const needsConfirmation = [];
-
-        // Discount detection
-        let discount = '';
-        const discountMatch = textUpper.match(/(\d{1,2}%\s*(?:OFF|FLAT)?)/i);
-        if (discountMatch) {
-            discount = discountMatch[1].trim();
-            if (!discount.includes('OFF') && !discount.includes('FLAT')) discount += ' OFF';
-        } else if (textUpper.includes('BOGO') || textUpper.includes('BUY 1 GET 1')) {
-            discount = 'Buy 1 Get 1 Free';
-        } else {
-            discount = 'Special Privilege';
-            needsConfirmation.push('discount');
-        }
-
-        // Coupon code detection - strict: NEVER invent!
-        let couponCode = '';
-        const codeMatch = textUpper.match(/(?:CODE|COUPON|PROMO)[:\s]+([A-Z0-9_-]{4,15})/i);
-        if (codeMatch) {
-            couponCode = codeMatch[1];
-        } else if (textUpper.includes('DIWALI50')) {
-            couponCode = 'DIWALI50';
-        } else if (textUpper.includes('SILK40')) {
-            couponCode = 'SILK40';
-        } else if (textUpper.includes('SUMMER50')) {
-            couponCode = 'SUMMER50';
-        } else if (textUpper.includes('SUMMER25')) {
-            couponCode = 'SUMMER25';
-        } else if (textUpper.includes('SPRING25')) {
-            couponCode = 'SPRING25';
-        } else {
-            // Anti-hallucination guarantee: If unmentioned, do NOT invent.
-            couponCode = '';
-            needsConfirmation.push('couponCode');
-        }
-
-        // Validity Date detection
-        let validUntil = '15 Aug 2026';
-        const dateMatch = textToScan.match(/(?:VALID\s+UNTIL|EXPIR(?:ES|Y)|TILL)[:\s]+([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}\s+[A-Za-z]{3,9}\s+[0-9]{4})/i);
-        if (dateMatch) {
-            validUntil = dateMatch[1];
-        } else {
-            needsConfirmation.push('validUntil');
-        }
-
-        // Business Name detection
-        let businessName = 'Trends Lifestyle';
-        if (textUpper.includes('ROYAL SILK')) businessName = 'Royal Silk Sarees';
-        else if (textUpper.includes('DIWALI GRAND') || textUpper.includes('ELECTRONICS')) businessName = 'Grand Electronics';
-        else if (textUpper.includes('RELIANCE')) businessName = 'Reliance Trends';
-
-        // Campaign Context detection
-        let campaignContext = 'Seasonal Collection Promotion';
-        if (textUpper.includes('DIWALI') || textUpper.includes('FESTIV') || textUpper.includes('DEEPAVALI')) campaignContext = 'Diwali Festive Mega Sale';
-        else if (textUpper.includes('SUMMER')) campaignContext = 'Summer Clearance Sale';
-        else if (textUpper.includes('WINTER')) campaignContext = 'Winter Warmup Special';
-
-        const extracted = {
-            businessName,
-            productName: businessName.includes('Silk') ? 'Kanchipuram Silk Saree' : 'Fashion & Everyday Wear',
-            offerTitle: `${discount} Flash Sale`,
-            discount,
-            couponCode,
-            validUntil,
-            terms: 'Valid on select merchandise while stock lasts. T&C apply.',
-            contactNumber: process.env.CUSTOMER_CARE_NUMBER || '+916369825386',
-            websiteUrl: 'https://trendsfashion.in',
-            callToAction: 'Visit Store & Redeem',
-            campaignContext,
-            confidenceScores: {
-                discount: discount !== 'Special Privilege' ? 0.95 : 0.50,
-                couponCode: couponCode ? 0.94 : 0.30,
-                validUntil: dateMatch ? 0.90 : 0.60,
-                businessName: 0.92
-            },
-            needsConfirmation
+        // Backward compatibility flattened accessors (preserving structured objects)
+        extracted.businessName = extracted.brandName?.value || null;
+        extracted.rawDiscount = extracted.discount?.value || null;
+        extracted.rawCouponCode = extracted.couponCode?.value || null;
+        extracted.rawValidUntil = extracted.validUntil?.value || null;
+        extracted.terms = (extracted.termsAndConditions || []).join('. ') || null;
+        extracted.campaignContext = extracted.offerTitle?.value || 'Promotional Campaign';
+        extracted.needsConfirmation = extracted.missingFields || [];
+        extracted.confidenceScores = {
+            discount: extracted.discount?.value ? 0.95 : 0.0,
+            couponCode: extracted.couponCode?.value ? 0.95 : 0.0,
+            validUntil: extracted.validUntil?.value ? 0.90 : 0.0,
+            businessName: extracted.businessName ? 0.95 : 0.0
         };
 
         return {
@@ -309,19 +206,46 @@ Strict rules:
         const validLanguages = languages.length > 0 ? languages : ['english'];
         const selectedTone = SUPPORTED_TONES.includes(tone) ? tone : 'promotional';
 
-        const variants = [];
+        let variants = [];
 
-        // Generate 5 variations for each selected language
+        try {
+            variants = await geminiService.generateRegionalMessages({
+                confirmedOfferData: extractedOfferData,
+                languages: validLanguages,
+                tone: selectedTone,
+                channel
+            });
+            variants.forEach(v => { v.generationId = id; });
+        } catch (geminiErr) {
+            console.warn('[Gemini Generator Warning] Using grounded local template engine:', geminiErr.message);
+            // Fallback to grounded local templates if Gemini call fails
+            for (const lang of validLanguages) {
+                const langCode = lang.toLowerCase();
+                const generatedVariants = this.buildLanguageVariants({
+                    language: langCode,
+                    channel,
+                    tone: selectedTone,
+                    offer: extractedOfferData,
+                    generationId: id
+                });
+                variants.push(...generatedVariants);
+            }
+        }
+
+        // Ensure all requested languages are fulfilled without gaps
         for (const lang of validLanguages) {
             const langCode = lang.toLowerCase();
-            const generatedVariants = this.buildLanguageVariants({
-                language: langCode,
-                channel,
-                tone: selectedTone,
-                offer: extractedOfferData,
-                generationId: id
-            });
-            variants.push(...generatedVariants);
+            const hasLang = variants.some(v => v.language.toLowerCase() === langCode);
+            if (!hasLang) {
+                const generatedVariants = this.buildLanguageVariants({
+                    language: langCode,
+                    channel,
+                    tone: selectedTone,
+                    offer: extractedOfferData,
+                    generationId: id
+                });
+                variants.push(...generatedVariants);
+            }
         }
 
         const record = {
@@ -353,13 +277,14 @@ Strict rules:
 
     // Build 5 variations per language in authentic regional native script
     buildLanguageVariants({ language, channel, tone, offer, generationId }) {
-        const bus = offer.businessName || 'Trends';
-        const disc = offer.discount || '25% OFF';
-        const code = offer.couponCode || 'SUMMER25';
-        const expiry = offer.validUntil || '15 Aug 2026';
-        const care = offer.contactNumber || process.env.CUSTOMER_CARE_NUMBER || '+916369825386';
-        const cta = offer.callToAction || 'Shop Now';
-        const title = offer.offerTitle || 'Special Offer';
+        const getV = f => (f && typeof f === 'object' && 'value' in f ? f.value : f);
+        const bus = getV(offer.brandName) || offer.businessName || 'Trends';
+        const disc = getV(offer.discount) || 'Special Privilege';
+        const code = getV(offer.couponCode) || '';
+        const expiry = getV(offer.validUntil) || '15 Aug 2026';
+        const care = getV(offer.contactNumber) || process.env.CUSTOMER_CARE_NUMBER || '+916369825386';
+        const cta = getV(offer.callToAction) || 'Shop Now';
+        const title = getV(offer.offerTitle) || 'Special Offer';
 
         const variantDefs = [
             { type: 'primary', label: 'Primary Promotional' },
@@ -617,126 +542,148 @@ Strict rules:
             ? extractedOfferData
             : (gen?.extractedOfferData || {});
 
-        const bus = offer.businessName || 'Trends';
-        const disc = offer.discount || '25% OFF';
-        const code = offer.couponCode || 'SUMMER25';
-        const expiry = offer.validUntil || '15 Aug 2026';
-        const care = offer.contactNumber || process.env.CUSTOMER_CARE_NUMBER || '+916369825386';
+        const initialVariant = gen?.variants?.find(v => v.variantType === 'primary')?.messageBody || '';
 
-        const followUpRecords = [];
+        let followUpRecords = [];
+        try {
+            followUpRecords = await geminiService.generateScheduleAwareFollowUps({
+                confirmedOfferData: offer,
+                approvedInitialMessage: initialVariant,
+                languages: rawLanguages,
+                channel,
+                schedule: activeSchedule,
+                tone
+            });
+            followUpRecords.forEach(f => {
+                f.generationId = generationId;
+                f.campaignId = campaignId;
+            });
+        } catch (geminiErr) {
+            console.warn('[Gemini Follow-Up Warning] Using grounded sequence generator:', geminiErr.message);
 
-        for (const item of activeSchedule) {
-            const seq = item.sequenceNumber || item.sequence || 1;
-            const stage = item.stage || (seq === 1 ? 'INITIAL' : seq === 2 ? 'REMINDER' : seq === 3 ? 'REINFORCEMENT' : 'EXPIRY');
-            const scheduledInterval = item.scheduledInterval || item.interval || `Day ${seq * 2} — 11:00 AM`;
+            const bus = offer.brandName?.value || offer.businessName || 'Trends';
+            const disc = offer.discount?.value || offer.discount;
+            const code = offer.couponCode?.value || offer.couponCode;
+            const expiry = offer.validUntil?.value || offer.validUntil;
+            const care = offer.contactNumber?.value || offer.contactNumber || process.env.CUSTOMER_CARE_NUMBER || '+916369825386';
 
-            for (const rawLang of rawLanguages) {
-                const langCode = this.normalizeLanguage(rawLang);
-                let msg = '';
+            for (const item of activeSchedule) {
+                const seq = item.sequenceNumber || item.sequence || 1;
+                const stage = item.stage || (seq === 1 ? 'INITIAL' : seq === 2 ? 'REMINDER' : seq === 3 ? 'REINFORCEMENT' : 'EXPIRY');
+                const scheduledInterval = item.scheduledInterval || item.interval || `Day ${seq * 2} — 11:00 AM`;
 
-                switch (langCode) {
-                    case 'tamil':
-                        if (stage === 'INITIAL') {
-                            msg = `வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${disc} சிறப்பு சலுகை! குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}. தொடர்புக்கு: ${care}. நிறுத்த STOP அனுப்பவும்.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `நினைவூட்டல்: வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${disc} சலுகை இன்னும் உங்களுக்காக காத்திருக்கிறது. குறியீடு: ${code}. செல்லுபடியாகும் நாள்: ${expiry}.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `அன்புள்ள {{customer_name}}, எளிய பரிமாற்றம் மற்றும் தரமான ஆடைத் தொகுப்பு! ${bus} இன் ${disc} சலுகையை குறியீடு ${code} மூலம் இப்போதே பயன்படுத்துங்கள்.`;
-                        } else {
-                            msg = `கடைசி வாய்ப்பு! {{customer_name}}, ${bus} இன் ${disc} சலுகை இன்றோடு முடிவடைகிறது. குறியீடு: ${code}. உடனே வருகை தரவும்!`;
-                        }
-                        break;
+                for (const rawLang of rawLanguages) {
+                    const langCode = this.normalizeLanguage(rawLang);
+                    let msg = '';
 
-                    case 'telugu':
-                        if (stage === 'INITIAL') {
-                            msg = `నమస్కారం {{customer_name}}, ${bus} నుండి ప్రత్యేక ${disc} ఆఫర్! కోడ్: ${code}. గడువు: ${expiry}. సంప్రదించండి: ${care}. ఆపడానికి STOP పంపండి.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `రిమైండర్: నమస్కారం {{customer_name}}, ${bus} లో మీ ${disc} రాయితీ ఇంకా అందుబాటులో ఉంది. కోడ్: ${code}. గడువు: ${expiry}.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `ప్రియమైన {{customer_name}}, సులభమైన ఎక్స్ఛేంజ్ మరియు నాణ్యత హామీ! ${bus} లో కోడ్ ${code} ఉపయోగించి ${disc} ప్రయోజనం పొందండి.`;
-                        } else {
-                            msg = `చివరి అవకాశం! {{customer_name}}, ${bus} ${disc} ఆఫర్ ఈరోజే ముగుస్తుంది. కోడ్: ${code}. ఇప్పుడే సందర్శించండి!`;
-                        }
-                        break;
+                    const discPhrase = disc ? `${disc} ` : '';
+                    const codePhrase = code ? `குறியீடு: ${code}. ` : '';
+                    const expPhrase = expiry ? `செல்லுபடியாகும் நாள்: ${expiry}. ` : '';
 
-                    case 'kannada':
-                        if (stage === 'INITIAL') {
-                            msg = `ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ವತಿಯಿಂದ ವಿಶೇಷ ${disc} ಕೊಡುಗೆ! ಕೋಡ್: ${code}. ಮಾನ್ಯತೆ: ${expiry}. ಸಂಪರ್ಕಿಸಿ: ${care}.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `ನೆನಪಿಸುವಿಕೆ: ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ನ ${disc} ರಿಯಾಯಿತಿ ಕೊಡುಗೆ ಇನ್ನೂ ಲಭ್ಯವಿದೆ. ಕೋಡ್: ${code}. ಮಾನ್ಯತೆ: ${expiry}.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `ಆತ್ಮೀಯ {{customer_name}}, ಸುಲಭ ವಿನಿಮಯ ಮತ್ತು ಉತ್ತಮ ಗುಣಮಟ್ಟದ ಭರವಸೆ! ${bus} ನಲ್ಲಿ ಕೋಡ್ ${code} ಬಳಸಿ ${disc} ಲಾಭ ಪಡೆಯಿರಿ.`;
-                        } else {
-                            msg = `ಅಂತಿಮ ಅವಕಾಶ! {{customer_name}}, ${bus} ನ ${disc} ಆಫರ್ ಇಂದು ಮುಕ್ತಾಯಗೊಳ್ಳುತ್ತದೆ. ಕೋಡ್: ${code}. ಇಂದೇ ಭೇಟಿ ನೀಡಿ!`;
-                        }
-                        break;
+                    switch (langCode) {
+                        case 'tamil':
+                            if (stage === 'INITIAL') {
+                                msg = `வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${discPhrase}சிறப்பு சலுகை! ${codePhrase}${expPhrase}தொடர்புக்கு: ${care}. நிறுத்த STOP அனுப்பவும்.`.replace(/\s+/g, ' ').trim();
+                            } else if (stage === 'REMINDER') {
+                                msg = `நினைவூட்டல்: வணக்கம் {{customer_name}}, ${bus} வழங்கும் ${discPhrase}சலுகை இன்னும் உங்களுக்காக காத்திருக்கிறது. ${codePhrase}${expPhrase}`.replace(/\s+/g, ' ').trim();
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `அன்புள்ள {{customer_name}}, ${bus} இன் ${discPhrase}சலுகையை ${code ? `குறியீடு ${code} மூலம் ` : ''}இப்போதே பயன்படுத்துங்கள். தொடர்புக்கு: ${care}.`.replace(/\s+/g, ' ').trim();
+                            } else {
+                                msg = `கடைசி வாய்ப்பு! {{customer_name}}, ${bus} இன் சலுகை நிறைவடைகிறது. ${codePhrase}உடனே வருகை தரவும்!`.replace(/\s+/g, ' ').trim();
+                            }
+                            break;
 
-                    case 'malayalam':
-                        if (stage === 'INITIAL') {
-                            msg = `നമസ്കാരം {{customer_name}}, ${bus} അവതരിപ്പിക്കുന്ന പ്രത്യേക ${disc} കിഴിവ്! കോഡ്: ${code}. കാലാവധി: ${expiry}. കെയർ: ${care}.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `ഓർമ്മപ്പെടുത്തൽ: നമസ്കാരം {{customer_name}}, ${bus} നൽകുന്ന ${disc} ഓഫർ ഇപ്പോഴും ലഭ്യമാണ്. കോഡ്: ${code}. കാലാവധി: ${expiry}.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `പ്രിയ {{customer_name}}, മികച്ച ഗുണനിലവാരവും എളുപ്പമുള്ള എക്സ്ചേഞ്ചും! ${bus} ൽ കോഡ് ${code} ഉപയോഗിച്ച് ${disc} സ്വന്തമാക്കൂ.`;
-                        } else {
-                            msg = `അവസാന അവസരം! {{customer_name}}, ${bus} ന്റെ ${disc} ഓഫർ ഇന്ന് അവസാനിക്കുന്നു. കോഡ്: ${code}. ഇപ്പോൾ തന്നെ സന്ദർശിക്കൂ!`;
-                        }
-                        break;
+                        case 'telugu':
+                            if (stage === 'INITIAL') {
+                                msg = `నమస్కారం {{customer_name}}, ${bus} నుండి ప్రత్యేక ${disc ? `${disc} ` : ''}ఆఫర్! ${code ? `కోడ్: ${code}. ` : ''}${expiry ? `గడువు: ${expiry}. ` : ''}సంప్రదించండి: ${care}.`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `రిమైండర్: నమస్కారం {{customer_name}}, ${bus} లో మీ ${disc ? `${disc} ` : ''}రాయితీ ఇంకా అందుబాటులో ఉంది. ${code ? `కోడ్: ${code}. ` : ''}`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `ప్రియమైన {{customer_name}}, ${bus} లో ${code ? `కోడ్ ${code} ఉపయోగించి ` : ''}ప్రయోజనం పొందండి. సంప్రదించండి: ${care}.`;
+                            } else {
+                                msg = `చివరి అవకాశం! {{customer_name}}, ${bus} ఆఫర్ ముగుస్తుంది. ${code ? `కోడ్: ${code}. ` : ''}ఇప్పుడే సందర్శించండి!`;
+                            }
+                            break;
 
-                    case 'hindi':
-                        if (stage === 'INITIAL') {
-                            msg = `नमस्ते {{customer_name}}, ${bus} की ओर से विशेष ${disc} छूट! कोड: ${code}। अंतिम तिथि: ${expiry}। हेल्पलाइन: ${care}।`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `स्मरण पत्र: नमस्ते {{customer_name}}, ${bus} का ${disc} ऑफर अभी भी आपके लिए उपलब्ध है। कोड: ${code}। अंतिम तिथि: ${expiry}।`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `नमस्ते {{customer_name}}, आसान रिटर्न और प्रीमियम क्वालिटी की गारंटी! ${bus} पर कोड ${code} का उपयोग कर ${disc} का लाभ उठाएं।`;
-                        } else {
-                            msg = `अंतिम अवसर! {{customer_name}}, ${bus} का विशेष ${disc} ऑफर आज समाप्त हो रहा है। कोड: ${code} का उपयोग तुरंत करें!`;
-                        }
-                        break;
+                        case 'kannada':
+                            if (stage === 'INITIAL') {
+                                msg = `ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ವತಿಯಿಂದ ವಿಶೇಷ ಕೊಡುಗೆ! ${code ? `ಕೋಡ್: ${code}. ` : ''}${expiry ? `ಮಾನ್ಯತೆ: ${expiry}. ` : ''}ಸಂಪರ್ಕಿಸಿ: ${care}.`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `ನೆನಪಿಸುವಿಕೆ: ನಮಸ್ಕಾರ {{customer_name}}, ${bus} ನ ರಿಯಾಯಿತಿ ಕೊಡುಗೆ ಇನ್ನೂ ಲಭ್ಯವಿದೆ. ${code ? `ಕೋಡ್: ${code}. ` : ''}`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `ಆತ್ಮೀಯ {{customer_name}}, ${bus} ನಲ್ಲಿ ${code ? `ಕೋಡ್ ${code} ಬಳಸಿ ` : ''}ಲಾಭ ಪಡೆಯಿರಿ.`;
+                            } else {
+                                msg = `ಅಂತಿಮ ಅವಕಾಶ! {{customer_name}}, ${bus} ನ ಆಫರ್ ಮುಕ್ತಾಯಗೊಳ್ಳುತ್ತದೆ. ${code ? `ಕೋಡ್: ${code}. ` : ''}ಇಂದೇ ಭೇಟಿ ನೀಡಿ!`;
+                            }
+                            break;
 
-                    case 'marathi':
-                        if (stage === 'INITIAL') {
-                            msg = `नमस्कार {{customer_name}}, ${bus} कडून खास ${disc} सवलत! कोड: ${code}. मुदत: ${expiry}. संपर्क: ${care}.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `आठवण: नमस्कार {{customer_name}}, ${bus} ची ${disc} सवलत अजूनही उपलब्ध आहे. कोड: ${code}. अंतिम मुदत: ${expiry}.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `सस्नेह नमस्कार {{customer_name}}, सुलभ एक्सचेंज आणि उत्तम दर्जेदार सेवा! ${bus} वर कोड ${code} वापरून ${disc} चा लाभ घ्या.`;
-                        } else {
-                            msg = `शेवटची संधी! {{customer_name}}, ${bus} ची ${disc} ऑफर आज संपत आहे. कोड: ${code}. लगेच भेट द्या!`;
-                        }
-                        break;
+                        case 'malayalam':
+                            if (stage === 'INITIAL') {
+                                msg = `നമസ്കാരം {{customer_name}}, ${bus} അവതരിപ്പിക്കുന്ന പ്രത്യേക കിഴിവ്! ${code ? `കോഡ്: ${code}. ` : ''}${expiry ? `കാലാവധി: ${expiry}. ` : ''}കെയർ: ${care}.`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `ഓർമ്മപ്പെടുത്തൽ: നമസ്കാരം {{customer_name}}, ${bus} നൽകുന്ന ഓഫർ ഇപ്പോഴും ലഭ്യമാണ്. ${code ? `കോഡ്: ${code}. ` : ''}`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `പ്രിയ {{customer_name}}, ${bus} ൽ ${code ? `കോഡ് ${code} ഉപയോഗിച്ച് ` : ''}സ്വന്തമാക്കൂ.`;
+                            } else {
+                                msg = `അവസാന അവസരം! {{customer_name}}, ${bus} ന്റെ ഓഫർ ഇന്ന് അവസാനിക്കുന്നു. ${code ? `കോഡ്: ${code}. ` : ''}ഇപ്പോൾ തന്നെ സന്ദർಶിക്കൂ!`;
+                            }
+                            break;
 
-                    case 'english':
-                    default:
-                        if (stage === 'INITIAL') {
-                            msg = `Hi {{customer_name}}, enjoy ${disc} on your purchase at ${bus}! Use code ${code} before ${expiry}. Questions? Call ${care}.`;
-                        } else if (stage === 'REMINDER') {
-                            msg = `Reminder: Hi {{customer_name}}, don't forget your ${disc} privilege at ${bus}! Use code ${code} before ${expiry}. Visit us today.`;
-                        } else if (stage === 'REINFORCEMENT') {
-                            msg = `Hi {{customer_name}}, premium quality & easy exchanges guaranteed! Claim your ${disc} at ${bus} using code ${code}. Questions? Call ${care}.`;
-                        } else {
-                            msg = `Final Call: Hi {{customer_name}}, your ${bus} ${disc} offer expires today (${expiry})! Use code ${code} before it closes.`;
-                        }
-                        break;
+                        case 'hindi':
+                            if (stage === 'INITIAL') {
+                                msg = `नमस्ते {{customer_name}}, ${bus} की ओर से विशेष ऑफर! ${code ? `कोड: ${code}। ` : ''}${expiry ? `अंतिम तिथि: ${expiry}। ` : ''}हेल्पलाइन: ${care}।`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `स्मरण पत्र: नमस्ते {{customer_name}}, ${bus} का ऑफर अभी भी आपके लिए उपलब्ध है। ${code ? `कोड: ${code}। ` : ''}`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `नमस्ते {{customer_name}}, ${bus} पर ${code ? `कोड ${code} का उपयोग कर ` : ''}लाभ उठाएं।`;
+                            } else {
+                                msg = `अंतिम अवसर! {{customer_name}}, ${bus} का विशेष ऑफर समाप्त हो रहा है। ${code ? `कोड: ${code}। ` : ''}`;
+                            }
+                            break;
+
+                        case 'marathi':
+                            if (stage === 'INITIAL') {
+                                msg = `नमस्कार {{customer_name}}, ${bus} कडून खास सवलत! ${code ? `कोड: ${code}. ` : ''}${expiry ? `मुदत: ${expiry}. ` : ''}संपर्क: ${care}.`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `आठवण: नमस्कार {{customer_name}}, ${bus} ची सवलत अजूनही उपलब्ध आहे. ${code ? `कोड: ${code}. ` : ''}`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `सस्नेह नमस्कार {{customer_name}}, ${bus} वर ${code ? `कोड ${code} वापरून ` : ''}लाभ घ्या.`;
+                            } else {
+                                msg = `शेवटची संधी! {{customer_name}}, ${bus} ची ऑफर संपत आहे. ${code ? `कोड: ${code}. ` : ''}लगेच भेट द्या!`;
+                            }
+                            break;
+
+                        case 'english':
+                        default:
+                            if (stage === 'INITIAL') {
+                                msg = `Hi {{customer_name}}, enjoy special savings at ${bus}! ${code ? `Use code ${code}. ` : ''}${expiry ? `Valid until ${expiry}. ` : ''}Questions? Call ${care}.`;
+                            } else if (stage === 'REMINDER') {
+                                msg = `Reminder: Hi {{customer_name}}, your privilege at ${bus} is waiting! ${code ? `Use code ${code}. ` : ''}Visit us today.`;
+                            } else if (stage === 'REINFORCEMENT') {
+                                msg = `Hi {{customer_name}}, claim your offer at ${bus} ${code ? `using code ${code}. ` : ''}Questions? Call ${care}.`;
+                            } else {
+                                msg = `Final Call: Hi {{customer_name}}, your ${bus} offer closes soon! ${code ? `Use code ${code} before closing.` : ''}`;
+                            }
+                            break;
+                    }
+
+                    const rec = {
+                        id: `fup_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                        campaignId: campaignId ? String(campaignId) : null,
+                        generationId: generationId ? String(generationId) : null,
+                        sequenceNumber: seq,
+                        stage,
+                        scheduledInterval,
+                        language: langCode,
+                        channel,
+                        messageBody: msg,
+                        eligibilityRule: seq === 1 ? 'ALL_ELIGIBLE' : seq === 2 ? 'NOT_REPLIED' : 'NOT_CONVERTED',
+                        approvalStatus: 'PENDING',
+                        createdAt: new Date().toISOString()
+                    };
+
+                    followUpRecords.push(rec);
                 }
-
-                const rec = {
-                    id: `fup_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                    campaignId: campaignId ? String(campaignId) : null,
-                    generationId: generationId ? String(generationId) : null,
-                    sequenceNumber: seq,
-                    stage,
-                    scheduledInterval,
-                    language: langCode,
-                    channel,
-                    messageBody: msg,
-                    eligibilityRule: seq === 1 ? 'ALL_ELIGIBLE' : seq === 2 ? 'NOT_REPLIED' : 'NOT_CONVERTED',
-                    approvalStatus: 'PENDING',
-                    createdAt: new Date().toISOString()
-                };
-
-                followUpRecords.push(rec);
             }
         }
 
@@ -745,6 +692,27 @@ Strict rules:
         await this._writeFollowUps(updatedFollowUps);
 
         return followUpRecords;
+    }
+
+    async confirmOfferFields({ generationId, confirmedFields = {} }) {
+        const generations = await this._readGenerations();
+        const gen = generations.find(g => g.id === generationId);
+        if (!gen) throw new Error(`Generation record not found: ${generationId}`);
+
+        gen.extractedOfferData = {
+            ...gen.extractedOfferData,
+            ...confirmedFields,
+            isConfirmed: true,
+            confirmedAt: new Date().toISOString()
+        };
+        gen.isConfirmed = true;
+        gen.confirmedAt = new Date().toISOString();
+        gen.extractedData = gen.extractedOfferData;
+        gen.generationStatus = 'CONFIRMED';
+        gen.updatedAt = new Date().toISOString();
+
+        await this._writeGenerations(generations);
+        return gen;
     }
 
     // Strict Approval & No Automatic Substitution Validator

@@ -1213,6 +1213,22 @@ app.get('/api/ai-templates', async (req, res) => {
     }
 });
 
+// Gemini Status check
+app.get('/api/ai-templates/gemini-status', (req, res) => {
+    try {
+        const geminiService = require('./services/geminiService');
+        const apiKey = process.env.GEMINI_API_KEY;
+        res.json({
+            configured: !!apiKey,
+            model: geminiService.defaultModel,
+            fallbackModels: geminiService.fallbackModels,
+            auditLogsCount: geminiService.getAuditLogs().length
+        });
+    } catch (err) {
+        res.status(500).json({ configured: false, error: err.message });
+    }
+});
+
 app.get('/api/ai-templates/:id', async (req, res) => {
     try {
         const item = await aiTemplateService.getGeneration(req.params.id);
@@ -1241,6 +1257,20 @@ app.patch('/api/ai-templates/:id', async (req, res) => {
 });
 
 // Validate regional language version approvals before broadcast (Strict no automatic substitution)
+// Confirm extracted offer fields before message generation
+app.post('/api/ai-templates/:id/confirm-fields', async (req, res) => {
+    try {
+        const { confirmedFields } = req.body;
+        const result = await aiTemplateService.confirmOfferFields({
+            generationId: req.params.id,
+            confirmedFields: confirmedFields || {}
+        });
+        res.json({ success: true, generation: result });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 app.post('/api/ai-templates/:id/validate-approval', async (req, res) => {
     try {
         const { requiredLanguages = [] } = req.body;
