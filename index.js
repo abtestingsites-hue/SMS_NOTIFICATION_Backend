@@ -1452,6 +1452,68 @@ app.post('/api/ai-templates/:id/use-in-campaign', async (req, res) => {
     }
 });
 
+// =========================================================================
+// Visual Campaign Builder APIs (PHASE 18)
+// =========================================================================
+const campaignBuilderService = require('./services/campaignBuilderService');
+
+app.get('/api/campaign-builder/drafts', async (req, res) => {
+    try {
+        const drafts = await campaignBuilderService.getAllDrafts();
+        res.json(drafts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/campaign-builder/drafts/:id', async (req, res) => {
+    try {
+        const draft = await campaignBuilderService.getDraftById(req.params.id);
+        if (!draft) return res.status(404).json({ error: 'Draft not found' });
+        res.json(draft);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/campaign-builder/drafts', async (req, res) => {
+    try {
+        const draft = await campaignBuilderService.saveDraft(req.body);
+        res.json({ success: true, draft });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/campaign-builder/drafts/:id', async (req, res) => {
+    try {
+        const result = await campaignBuilderService.deleteDraft(req.params.id);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/campaign-builder/audience-summary', async (req, res) => {
+    try {
+        const segment = req.query.segment || 'All';
+        const summary = await campaignBuilderService.getAudienceSummary(segment);
+        res.json(summary);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/campaign-builder/launch', async (req, res) => {
+    try {
+        const result = await campaignBuilderService.launchCampaign(req.body);
+        res.json(result);
+    } catch (err) {
+        console.error('[Campaign Builder Launch Error]:', err.message);
+        res.status(400).json({ error: err.message });
+    }
+});
+
 // Start scheduler background runner
 schedulerService.startRunner({ DataManager, QueueSimulator });
 

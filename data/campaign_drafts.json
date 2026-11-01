@@ -1,0 +1,57 @@
+[
+  {
+    "id": "draft_1793547911835_aeecc8ce",
+    "name": "Diwali Festive Blitz Draft",
+    "description": "",
+    "status": "DRAFT",
+    "channel": "both",
+    "creativeAssetId": null,
+    "creativeAsset": null,
+    "contentBlocks": [
+      {
+        "id": "blk_1",
+        "type": "headline",
+        "label": "Headline",
+        "content": "🌟 Festive Mega Sale 🌟"
+      },
+      {
+        "id": "blk_2",
+        "type": "description",
+        "label": "Description",
+        "content": "Get flat 50% discount on all festive collections."
+      }
+    ],
+    "offerId": null,
+    "offer": null,
+    "audienceSelection": {
+      "type": "all",
+      "segmentName": "All",
+      "totalCount": 0,
+      "smsEligibleCount": 0,
+      "whatsappEligibleCount": 0,
+      "suppressedCount": 0,
+      "optedOutCount": 0,
+      "languageBreakdown": {}
+    },
+    "languageConfig": {
+      "selectedLanguages": [
+        "tamil",
+        "telugu",
+        "kannada"
+      ],
+      "defaultLanguage": "tamil",
+      "languageVariants": {},
+      "languageApprovals": {}
+    },
+    "scheduleConfig": {
+      "mode": "NOW",
+      "scheduledDate": "",
+      "scheduledTime": "",
+      "timezone": "Asia/Kolkata",
+      "followUps": []
+    },
+    "geminiExtraction": null,
+    "createdAt": "2026-11-01T15:45:11.835Z",
+    "updatedAt": "2026-11-01T15:45:11.835Z"
+  }
+]

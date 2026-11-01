@@ -497,6 +497,165 @@
       "customerCareNumber": "+916369825386",
       "sendToCustomerCare": true,
       "customerCareNotified": true
+    },
+    {
+      "id": 1793549047425,
+      "name": "Test Bulk Dispatch Phase 18",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T16:04:07.425Z",
+      "scheduledFor": "2026-11-01T16:04:07.425Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Special Festive Offer\n\nReply STOP to opt out.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [
+        {
+          "id": "b1",
+          "type": "headline",
+          "label": "Headline",
+          "content": "Special Festive Offer",
+          "order": 1
+        },
+        {
+          "id": "b2",
+          "type": "optout",
+          "label": "Opt-out",
+          "content": "Reply STOP to opt out.",
+          "order": 2
+        }
+      ],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793549092682,
+      "name": "Test Bulk Dispatch Phase 18",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T16:04:52.682Z",
+      "scheduledFor": "2026-11-01T16:04:52.682Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Special Festive Offer\n\nReply STOP to opt out.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [
+        {
+          "id": "b1",
+          "type": "headline",
+          "label": "Headline",
+          "content": "Special Festive Offer",
+          "order": 1
+        },
+        {
+          "id": "b2",
+          "type": "optout",
+          "label": "Opt-out",
+          "content": "Reply STOP to opt out.",
+          "order": 2
+        }
+      ],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
+    },
+    {
+      "id": 1793549115623,
+      "name": "Test Bulk Dispatch Phase 18",
+      "status": "COMPLETED",
+      "total": 16,
+      "sent": 0,
+      "delivered": 0,
+      "failed": 0,
+      "createdAt": "2026-11-01T16:05:15.623Z",
+      "scheduledFor": "2026-11-01T16:05:15.623Z",
+      "validUntil": null,
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Special Festive Offer\n\nReply STOP to opt out.",
+      "mediaId": null,
+      "mediaAsset": null,
+      "mediaEnabled": false,
+      "mediaType": null,
+      "offer": null,
+      "offerId": null,
+      "contentBlocks": [
+        {
+          "id": "b1",
+          "type": "headline",
+          "label": "Headline",
+          "content": "Special Festive Offer",
+          "order": 1
+        },
+        {
+          "id": "b2",
+          "type": "optout",
+          "label": "Opt-out",
+          "content": "Reply STOP to opt out.",
+          "order": 2
+        }
+      ],
+      "languageConfig": {
+        "selectedLanguages": [
+          "tamil"
+        ],
+        "defaultLanguage": "tamil",
+        "languageVariants": {}
+      },
+      "scheduleConfig": {
+        "mode": "NOW",
+        "scheduledDate": "",
+        "scheduledTime": "",
+        "timezone": "Asia/Kolkata",
+        "followUps": []
+      },
+      "geminiExtraction": null,
+      "builderIntegrated": true
     }
   ],
   "offers": [
