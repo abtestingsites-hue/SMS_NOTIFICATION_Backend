@@ -24,10 +24,19 @@ const aiTemplateService = require('./services/aiTemplateService');
 
 // Global process resilience handlers
 process.on('uncaughtException', (err) => {
-    console.error('[Process Error] Uncaught Exception:', err?.message || err);
+    console.error('[Process Error] Uncaught Exception:', err?.stack || err);
 });
 process.on('unhandledRejection', (reason) => {
-    console.error('[Process Error] Unhandled Rejection:', reason?.message || reason);
+    console.error('[Process Error] Unhandled Rejection:', reason?.stack || reason);
+});
+process.on('exit', (code) => {
+    console.error(`[Process Exit] Exiting with code: ${code}`);
+});
+process.on('SIGINT', () => {
+    console.error('[Process Signal] Received SIGINT');
+});
+process.on('SIGTERM', () => {
+    console.error('[Process Signal] Received SIGTERM');
 });
 
 const app = express();
