@@ -22,6 +22,14 @@ const notificationService = require('./services/notificationService');
 const dispatchTelemetryService = require('./services/dispatchTelemetryService');
 const aiTemplateService = require('./services/aiTemplateService');
 
+// Global process resilience handlers
+process.on('uncaughtException', (err) => {
+    console.error('[Process Error] Uncaught Exception:', err?.message || err);
+});
+process.on('unhandledRejection', (reason) => {
+    console.error('[Process Error] Unhandled Rejection:', reason?.message || reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

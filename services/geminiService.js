@@ -99,10 +99,11 @@ class GeminiService {
                             break; // break retry loop to move to next model
                         }
 
-                        // If daily quota exceeded, immediately abort retries and throw to trigger grounded fallback
-                        if (errMsg.includes('Quota exceeded') || errMsg.includes('free_tier_requests')) {
-                            console.warn(`[Gemini] Daily quota exceeded on free tier. Using grounded fallback engine.`);
-                            throw new Error(`Gemini Daily Quota Exceeded: ${errMsg}`);
+                        // If quota limit exceeded on this model, immediately try next fallback model
+                        if (errMsg.toLowerCase().includes('quota') || errMsg.includes('free_tier_requests')) {
+                            console.warn(`[Gemini] Quota limit on ${model}. Trying next fallback model immediately.`);
+                            lastError = new Error(errMsg);
+                            break;
                         }
 
                         // On rate limit (429) or temporary server error (503), wait and retry
