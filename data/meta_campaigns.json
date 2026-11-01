@@ -1,0 +1,85 @@
+{
+  "selectedAccountId": "act_982341908234",
+  "adAccounts": [
+    {
+      "id": "act_982341908234",
+      "name": "Primary Retail Enterprise Account",
+      "currency": "USD",
+      "balance": "$2,450.00"
+    },
+    {
+      "id": "act_112938472910",
+      "name": "Seasonal Growth & Acquisition",
+      "currency": "USD",
+      "balance": "$1,120.00"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "meta_camp_101",
+      "name": "Summer Lookbook Retargeting - Lookalike 2%",
+      "objective": "CONVERSIONS",
+      "status": "ACTIVE",
+      "dailyBudget": 150,
+      "spend": 1420.5,
+      "impressions": 48920,
+      "clicks": 2140,
+      "ctr": 4.37,
+      "cpc": 0.66,
+      "conversions": 184,
+      "roas": 3.82,
+      "adSetCount": 3,
+      "creative": {
+        "headline": "Refresh Your Summer Style | 25% Off",
+        "body": "Exclusive seasonal drops curated for modern comfort. Tap to unlock your code.",
+        "callToAction": "SHOP_NOW",
+        "mediaUrl": "/uploads/media/sample_banner.png"
+      },
+      "createdAt": "2026-10-22T04:38:38.289Z"
+    },
+    {
+      "id": "meta_camp_102",
+      "name": "WhatsApp Click-to-Chat Flash Promotion",
+      "objective": "MESSAGES",
+      "status": "ACTIVE",
+      "dailyBudget": 75,
+      "spend": 680,
+      "impressions": 26400,
+      "clicks": 1490,
+      "ctr": 5.64,
+      "cpc": 0.45,
+      "conversions": 112,
+      "roas": 4.2,
+      "adSetCount": 2,
+      "creative": {
+        "headline": "Instant WhatsApp Concierge & VIP Offer",
+        "body": "Chat with our style advisor directly on WhatsApp for tailored sizing and discounts.",
+        "callToAction": "SEND_WHATSAPP_MESSAGE",
+        "mediaUrl": "/uploads/media/chat_promo.png"
+      },
+      "createdAt": "2026-10-27T04:38:38.289Z"
+    },
+    {
+      "id": "meta_camp_103",
+      "name": "Autumn Catalog Preview Awareness",
+      "objective": "BRAND_AWARENESS",
+      "status": "PAUSED",
+      "dailyBudget": 50,
+      "spend": 250,
+      "impressions": 18200,
+      "clicks": 430,
+      "ctr": 2.36,
+      "cpc": 0.58,
+      "conversions": 14,
+      "roas": 1.95,
+      "adSetCount": 1,
+      "creative": {
+        "headline": "Incoming Autumn Collection 2026",
+        "body": "Preview timeless textures and refined essentials.",
+        "callToAction": "LEARN_MORE",
+        "mediaUrl": ""
+      },
+      "createdAt": "2026-10-12T04:38:38.289Z"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schedules": [
+    {
+      "id": "sch_1793526835295",
+      "name": "Weekend VIP Flash Sale",
+      "type": "WEEKLY",
+      "cron": "0 10 * * 6",
+      "scheduledAt": "2026-11-03T09:53:55.295Z",
+      "timezone": "Asia/Kolkata",
+      "channel": "both",
+      "targetAudience": "All",
+      "templateContent": "Hi {{1}}, our weekend special is now live! Use code {{2}} to get {{3}} today only.",
+      "offerCode": "SUMMER25",
+      "idempotencyKey": "idemp_4a22cf65e20760fe",
+      "status": "SCHEDULED",
+      "createdAt": "2026-11-01T09:53:55.299Z",
+      "lastRunAt": null,
+      "executionCount": 0,
+      "logs": []
+    }
+  ]
+}

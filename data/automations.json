@@ -1,0 +1,72 @@
+{
+  "automations": [
+    {
+      "id": "aut_reengage_48h",
+      "name": "48-Hour Unopened Offer Nudge",
+      "active": true,
+      "trigger": {
+        "type": "DAYS_INACTIVE",
+        "delayValue": 2,
+        "delayUnit": "DAYS"
+      },
+      "conditions": [
+        {
+          "field": "gender",
+          "operator": "EQUALS",
+          "value": "All"
+        }
+      ],
+      "actions": [
+        {
+          "type": "SEND_WHATSAPP",
+          "channel": "whatsapp",
+          "template": "Hi {{1}}, your exclusive offer code {{2}} is expiring soon! Tap here to claim before Sunday midnight.",
+          "offerCode": "SUMMER25"
+        }
+      ],
+      "stats": {
+        "triggeredCount": 142,
+        "completedCount": 138,
+        "convertedCount": 29
+      },
+      "createdAt": "2026-10-25T04:38:38.281Z",
+      "logs": [
+        {
+          "timestamp": "2026-11-01T02:38:38.281Z",
+          "event": "TRIGGERED",
+          "details": "Evaluated 12 eligible customers. Dispatched 12 follow-ups."
+        }
+      ]
+    },
+    {
+      "id": "aut_vip_care_alert",
+      "name": "High-Value VIP Follow-Up",
+      "active": true,
+      "trigger": {
+        "type": "CAMPAIGN_DISPATCHED",
+        "delayValue": 1,
+        "delayUnit": "HOURS"
+      },
+      "conditions": [
+        {
+          "field": "age",
+          "operator": "GREATER_THAN",
+          "value": "25"
+        }
+      ],
+      "actions": [
+        {
+          "type": "NOTIFY_CARE",
+          "note": "VIP customer received campaign. Customer care desk ready for priority call handling."
+        }
+      ],
+      "stats": {
+        "triggeredCount": 54,
+        "completedCount": 54,
+        "convertedCount": 18
+      },
+      "createdAt": "2026-10-18T04:38:38.281Z",
+      "logs": []
+    }
+  ]
+}

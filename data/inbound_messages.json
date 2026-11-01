@@ -1,0 +1,424 @@
+{
+  "messages": [
+    {
+      "id": "inb_1793521251204_3r41",
+      "messageSid": "SM_optout_test_1793521251193",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T08:20:51.204Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793521251174_829p",
+      "messageSid": "SM_inbound_test_1793521251165",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T08:20:51.174Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793519985026_bx0q",
+      "messageSid": "SM_optout_test_1793519985011",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:59:45.026Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793519984993_rise",
+      "messageSid": "SM_inbound_test_1793519984976",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:59:44.993Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793518709150_bx5w",
+      "messageSid": "SM_optout_test_1793518709139",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:38:29.150Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793518709116_t845",
+      "messageSid": "SM_inbound_test_1793518709088",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:38:29.116Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793517121265_admk",
+      "messageSid": "SM_optout_test_1793517121250",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:12:01.265Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793517121231_wu3g",
+      "messageSid": "SM_inbound_test_1793517121176",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T07:12:01.231Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793515136868_cspe",
+      "messageSid": "SM_optout_test_1793515136762",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T06:38:56.868Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793515136659_5evw",
+      "messageSid": "SM_inbound_test_1793515136588",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T06:38:56.659Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793514019936_vedf",
+      "messageSid": "SM_optout_test_1793514019924",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T06:20:19.936Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793514019888_20m0",
+      "messageSid": "SM_inbound_test_1793514019816",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T06:20:19.888Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793512666690_mu77",
+      "messageSid": "SM_optout_test_1793512666674",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:57:46.690Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793512666643_i2n6",
+      "messageSid": "SM_inbound_test_1793512666626",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:57:46.643Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511172435_zaeq",
+      "messageSid": "SM_optout_test_1793511172420",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:32:52.435Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511172402_jlh4",
+      "messageSid": "SM_inbound_test_1793511172381",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:32:52.402Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511125467_eidp",
+      "messageSid": "SM_optout_test_1793511125444",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:32:05.467Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511125415_mtok",
+      "messageSid": "SM_inbound_test_1793511125400",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:32:05.415Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511063360_1cja",
+      "messageSid": "SM_optout_test_1793511063345",
+      "from": "+19998887777",
+      "rawFrom": "+19998887777",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "STOP",
+      "profileName": "Opt Out User",
+      "isOptOut": true,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_19998887777",
+        "name": "Opt Out User",
+        "phone": "+19998887777",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:31:03.360Z",
+      "status": "PROCESSED"
+    },
+    {
+      "id": "inb_1793511063315_q0qy",
+      "messageSid": "SM_inbound_test_1793511063256",
+      "from": "+17372508034",
+      "rawFrom": "+17372508034",
+      "to": "+12202404020",
+      "channel": "sms",
+      "body": "Hello! I would like more information on the summer sale.",
+      "profileName": "Alex Customer",
+      "isOptOut": false,
+      "isConversion": false,
+      "customer": {
+        "id": "guest_17372508034",
+        "name": "Alex Customer",
+        "phone": "+17372508034",
+        "isExistingCustomer": false
+      },
+      "cancelledFollowupsCount": 0,
+      "receivedAt": "2026-11-01T05:31:03.315Z",
+      "status": "PROCESSED"
+    }
+  ]
+}

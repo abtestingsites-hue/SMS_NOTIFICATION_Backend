@@ -1,0 +1,105 @@
+{
+  "twilio": {
+    "accountSid": "AC2ed68d0bd9be2d98fb1dbda537cac93f",
+    "authToken": "62fc4a51c751351d39999e7dcc0166b15b94c3feba8e1d6a9deb517f5290baccd5624e81cbf9e0329d915e33803ae3b69449b5d0a6291581fe46d88922b0faaa:673ea1a92dd5c1304aee08c4a31c0ce4:51b48ebce3067c2520a995b2c6fbff41:1aab861cd6f331e35721af4ba5fba7f825fe603f0201f5b69be3e5e1ef97dee1",
+    "messagingServiceSid": "",
+    "phoneNumber": "+12202404020",
+    "whatsappNumber": "whatsapp:+14155238886",
+    "status": "CONNECTED",
+    "lastVerified": "2026-11-01T06:50:36.737Z",
+    "accountName": "Testing",
+    "verifiedPermissions": [
+      "SMS Sending",
+      "WhatsApp Messaging",
+      "Carrier Dispatch"
+    ]
+  },
+  "meta": {
+    "appId": "109283746592819",
+    "appSecret": "3857986ad7311e27a628e36e4c7aa64918010210c73e71f56e180897b9e3d90d6685f0bf40f32c2bb1b35c9e68b14f4005945ccaf0cc647fc160cc108118c675:2a3724f598bce9e43084b4985415b1d3:e772da4562d1703951f1ea4a0c189c12:536381a74649ace2ccf71a141be9c69227e0bb44ff19e9de",
+    "accessToken": "87d995a97c7025e3ae676c0a66cafff1fc89fae294fc34b496c51cc0f157bc673bf3c64ea8f6a2fbd50f4b0748d17348aed212239888dd24a1f1682c46f2b241:9d2337870fdbc3a623f69e38fd5de5c3:7d365b1effe0e3b71894477beaf3ad00:d7d8ce13209d49f5458d3151a57440fd4ed83b4b763bcd8e58a0e77fdcb7f15ebdb99c0f",
+    "adAccountId": "act_982341908234",
+    "status": "VERIFICATION_FAILED",
+    "lastVerified": "2026-11-01T06:50:44.429Z",
+    "accountName": "Meta Marketing Suite (Lookalike & WhatsApp)",
+    "verifiedPermissions": [
+      "ads_management",
+      "ads_read",
+      "business_management"
+    ]
+  },
+  "google": {
+    "developerToken": "66aa766e1773180540f635f84a22d1a93233fca8ad5b6bff635da1452c128d820fbb667409c668b454cfbfcdf7b589022270f9657fb44f0e0d044a7cfa0ce0e9:14c2a38221df171cf7b3df9c494f8f41:bcd7adacb64c918ea956f227894ba776:2e20fbb102f1edc5f225b1f0f85c13387b521dc19013a50e689b62bad46f",
+    "clientId": "8394012993-client.apps.googleusercontent.com",
+    "clientSecret": "8c66c8bf972284a081a8602061c1e03efcbf4786a3ee0a3cbcc6a413aaaf56fc44b7135097881ccda246df476faaed393b9de1bf1e257ec0ed502458fff88fdb:c6652557f6ae79106b5f01624b6b5760:869f2362bc8723baee2c0c8997bf77cf:ea852d51c3cc0788285db07dda662c67a58f359134ea81",
+    "refreshToken": "",
+    "customerId": "839-401-2993",
+    "loginCustomerId": "",
+    "status": "CONNECTED",
+    "lastVerified": "2026-11-01T05:03:07.797Z",
+    "accountName": "Google Ads Manager (Search & PMax)",
+    "verifiedPermissions": [
+      "campaign_management",
+      "ad_reporting",
+      "budget_allocation"
+    ]
+  },
+  "auditLogs": [
+    {
+      "id": 1793515844429,
+      "timestamp": "2026-11-01T06:50:44.429Z",
+      "action": "VERIFICATION_FAILED",
+      "provider": "META",
+      "details": "Verification failed: Malformed access token EAAG982341908234_sample_access_token"
+    },
+    {
+      "id": 1793515836737,
+      "timestamp": "2026-11-01T06:50:36.737Z",
+      "action": "VERIFICATION_SUCCESS",
+      "provider": "TWILIO",
+      "details": "Successfully authenticated and verified connection to twilio"
+    },
+    {
+      "id": 1793512385958,
+      "timestamp": "2026-11-01T05:53:05.958Z",
+      "action": "VERIFICATION_SUCCESS",
+      "provider": "TWILIO",
+      "details": "Successfully authenticated and verified connection to twilio"
+    },
+    {
+      "id": 1793510638972,
+      "timestamp": "2026-11-01T05:23:58.972Z",
+      "action": "VERIFICATION_SUCCESS",
+      "provider": "TWILIO",
+      "details": "Successfully authenticated and verified connection to twilio"
+    },
+    {
+      "id": 1793510633000,
+      "timestamp": "2026-11-01T05:23:53.000Z",
+      "action": "VERIFICATION_SUCCESS",
+      "provider": "TWILIO",
+      "details": "Successfully authenticated and verified connection to twilio"
+    },
+    {
+      "id": 1793509493015,
+      "timestamp": "2026-11-01T05:04:53.015Z",
+      "action": "VERIFICATION_SUCCESS",
+      "provider": "TWILIO",
+      "details": "Successfully authenticated and verified connection to twilio"
+    },
+    {
+      "id": 1793509387797,
+      "timestamp": "2026-11-01T05:03:07.797Z",
+      "action": "CREDENTIALS_INITIALIZED",
+      "provider": "ALL",
+      "details": "Encrypted production credentials for Twilio, Meta, and Google loaded"
+    },
+    {
+      "id": 1793507918277,
+      "timestamp": "2026-11-01T04:38:38.277Z",
+      "action": "SYSTEM_INIT",
+      "provider": "ALL",
+      "details": "Initial integration vault initialized"
+    }
+  ]
+}

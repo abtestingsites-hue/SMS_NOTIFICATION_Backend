@@ -1,0 +1,54 @@
+{
+  "customerId": "839-401-2993",
+  "customerName": "Enterprise Growth Search & Performance",
+  "campaigns": [
+    {
+      "id": "goog_camp_201",
+      "name": "High-Intent Search — Menswear & Accessories",
+      "type": "SEARCH",
+      "biddingStrategy": "TARGET_ROAS (380%)",
+      "status": "ENABLED",
+      "dailyBudget": 200,
+      "cost": 1840.2,
+      "impressions": 34100,
+      "clicks": 3120,
+      "avgCpc": 0.59,
+      "conversions": 245,
+      "costPerConversion": 7.51,
+      "keywordsCount": 42,
+      "createdAt": "2026-10-20T04:38:38.293Z"
+    },
+    {
+      "id": "goog_camp_202",
+      "name": "Performance Max — Omni-Channel Retargeting",
+      "type": "PERFORMANCE_MAX",
+      "biddingStrategy": "MAXIMIZE_CONVERSIONS",
+      "status": "ENABLED",
+      "dailyBudget": 120,
+      "cost": 920,
+      "impressions": 51200,
+      "clicks": 2840,
+      "avgCpc": 0.32,
+      "conversions": 180,
+      "costPerConversion": 5.11,
+      "keywordsCount": 18,
+      "createdAt": "2026-10-24T04:38:38.293Z"
+    },
+    {
+      "id": "goog_camp_203",
+      "name": "YouTube In-Stream Brand Video Spotlight",
+      "type": "VIDEO",
+      "biddingStrategy": "TARGET_CPM",
+      "status": "PAUSED",
+      "dailyBudget": 60,
+      "cost": 410,
+      "impressions": 62400,
+      "clicks": 910,
+      "avgCpc": 0.45,
+      "conversions": 22,
+      "costPerConversion": 18.63,
+      "keywordsCount": 10,
+      "createdAt": "2026-10-07T04:38:38.293Z"
+    }
+  ]
+}

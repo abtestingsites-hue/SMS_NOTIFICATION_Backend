@@ -1,0 +1,511 @@
+{
+  "campaigns": [
+    {
+      "id": 1767094872241,
+      "name": "Demo Blast",
+      "status": "COMPLETED",
+      "total": 14,
+      "sent": 14,
+      "createdAt": "2025-12-30T11:41:12.241Z"
+    },
+    {
+      "id": 1767097545942,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 34,
+      "sent": 34,
+      "createdAt": "2025-12-30T12:25:45.942Z"
+    },
+    {
+      "id": 1767097697421,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 39,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:28:17.421Z",
+      "scheduledFor": "2025-12-30T12:28:17.421Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767097824843,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 44,
+      "sent": 44,
+      "createdAt": "2025-12-30T12:30:24.843Z",
+      "scheduledFor": "2025-12-30T12:30:24.843Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098510074,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 49,
+      "createdAt": "2025-12-30T12:41:50.074Z",
+      "scheduledFor": "2025-12-30T12:41:50.074Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098573467,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 49,
+      "createdAt": "2025-12-30T12:42:53.467Z",
+      "scheduledFor": "2025-12-30T12:42:53.467Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098639232,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 49,
+      "createdAt": "2025-12-30T12:43:59.232Z",
+      "scheduledFor": "2025-12-30T12:43:59.232Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098699985,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 49,
+      "createdAt": "2025-12-30T12:44:59.985Z",
+      "scheduledFor": "2025-12-30T12:44:59.985Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098701123,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:01.123Z",
+      "scheduledFor": "2025-12-30T12:45:01.123Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098701722,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:01.722Z",
+      "scheduledFor": "2025-12-30T12:45:01.722Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098701920,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:01.920Z",
+      "scheduledFor": "2025-12-30T12:45:01.920Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098702107,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:02.107Z",
+      "scheduledFor": "2025-12-30T12:45:02.107Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098702301,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:02.301Z",
+      "scheduledFor": "2025-12-30T12:45:02.301Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098702478,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:02.478Z",
+      "scheduledFor": "2025-12-30T12:45:02.478Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098702657,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:02.657Z",
+      "scheduledFor": "2025-12-30T12:45:02.657Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767098702891,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "COMPLETED",
+      "total": 49,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:45:02.891Z",
+      "scheduledFor": "2025-12-30T12:45:02.891Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767099265343,
+      "name": "Seasonal Blast 12/30/2025",
+      "status": "PAUSED_LIMIT_REACHED",
+      "total": 54,
+      "sent": 0,
+      "createdAt": "2025-12-30T12:54:25.343Z",
+      "scheduledFor": "2025-12-30T12:54:25.343Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1767111802415,
+      "name": "Winter sale",
+      "status": "COMPLETED",
+      "total": 12,
+      "sent": 0,
+      "createdAt": "2025-12-30T16:23:22.415Z",
+      "scheduledFor": "2025-12-30T16:23:22.415Z",
+      "validUntil": "2026-01-06"
+    },
+    {
+      "id": 1793248086644,
+      "name": "Customer Care Integration Test",
+      "status": "COMPLETED",
+      "total": 12,
+      "sent": 12,
+      "createdAt": "2026-10-29T04:28:06.644Z",
+      "scheduledFor": "2026-10-29T04:28:06.644Z",
+      "validUntil": "2026-11-15",
+      "targetAudience": "All",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
+    },
+    {
+      "id": 1793250197664,
+      "name": "Diwali Fashion Blast",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 3,
+      "createdAt": "2026-10-29T05:03:17.664Z",
+      "scheduledFor": "2026-10-29T05:03:17.664Z",
+      "validUntil": "2026-11-20",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{1}} 👋\n\n✨ *Exclusive Offer Just for You!* ✨\n\n{{2}}\n\n⏰ *Offer Valid Until:* {{3}}\n\nVisit our store and grab your favorite styles before time runs out.\nCome and get it soon! 🛍️🔥\n\n",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
+    },
+    {
+      "id": 1793263220310,
+      "name": "PRIORITY ALERT 10/29/2026",
+      "status": "COMPLETED",
+      "total": 17,
+      "sent": 0,
+      "createdAt": "2026-10-29T08:40:20.310Z",
+      "scheduledFor": "2026-10-29T08:40:20.310Z",
+      "validUntil": "2026-11-05",
+      "targetAudience": "All",
+      "platform": "both",
+      "template": "Hi {{1}} 👋\n\n✨ *Exclusive Offer Just for You!* ✨\n\n{{2}}\n\n⏰ *Offer Valid Until:* {{3}}\n\nVisit our store and grab your favorite styles before time runs out.\nCome and get it soon! 🛍️🔥\n\n",
+      "customerCareNumber": "+916369825386",
+      "sendToCustomerCare": true,
+      "customerCareNotified": true
+    }
+  ],
+  "offers": [
+    {
+      "id": 1767097691832,
+      "code": "SUMMER25",
+      "discount": "25% OFF",
+      "description": "Summer Collection Special"
+    },
+    {
+      "id": 1767097691833,
+      "code": "WELCOME10",
+      "discount": "10% OFF",
+      "description": "New User Welcome Gift"
+    },
+    {
+      "id": 1767097691834,
+      "code": "VIP50",
+      "discount": "50% OFF",
+      "description": "Exclusive VIP Access"
+    },
+    {
+      "id": 1767097691835,
+      "code": "FLASH30",
+      "discount": "30% OFF",
+      "description": "24-Hour Flash Sale"
+    },
+    {
+      "id": 1767097821737,
+      "code": "SUMMER25",
+      "discount": "25% OFF",
+      "description": "Summer Collection Special"
+    },
+    {
+      "id": 1767097821738,
+      "code": "WELCOME10",
+      "discount": "10% OFF",
+      "description": "New User Welcome Gift"
+    },
+    {
+      "id": 1767097821739,
+      "code": "VIP50",
+      "discount": "50% OFF",
+      "description": "Exclusive VIP Access"
+    },
+    {
+      "id": 1767097821740,
+      "code": "FLASH30",
+      "discount": "30% OFF",
+      "description": "24-Hour Flash Sale"
+    },
+    {
+      "id": 1767098508656,
+      "code": "SUMMER25",
+      "discount": "25% OFF",
+      "description": "Summer Collection Special"
+    },
+    {
+      "id": 1767098508657,
+      "code": "WELCOME10",
+      "discount": "10% OFF",
+      "description": "New User Welcome Gift"
+    },
+    {
+      "id": 1767098508658,
+      "code": "VIP50",
+      "discount": "50% OFF",
+      "description": "Exclusive VIP Access"
+    },
+    {
+      "id": 1767098508659,
+      "code": "FLASH30",
+      "discount": "30% OFF",
+      "description": "24-Hour Flash Sale"
+    },
+    {
+      "id": 1767099262999,
+      "code": "SUMMER25",
+      "discount": "25% OFF",
+      "description": "Summer Collection Special"
+    },
+    {
+      "id": 1767099263000,
+      "code": "WELCOME10",
+      "discount": "10% OFF",
+      "description": "New User Welcome Gift"
+    },
+    {
+      "id": 1767099263001,
+      "code": "VIP50",
+      "discount": "50% OFF",
+      "description": "Exclusive VIP Access"
+    },
+    {
+      "id": 1767099263002,
+      "code": "FLASH30",
+      "discount": "30% OFF",
+      "description": "24-Hour Flash Sale"
+    },
+    {
+      "id": 1767111560608,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560609,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560610,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560611,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560612,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560613,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560614,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560615,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560616,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560617,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560618,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560619,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560620,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560621,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560622,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560623,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560624,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560625,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560626,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560627,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560628,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560629,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560630,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560631,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560632,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560633,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560634,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560635,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560636,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111560637,
+      "description": "Special Offer"
+    },
+    {
+      "id": 1767111781322,
+      "code": "SUMMER25",
+      "discount": "25% OFF",
+      "description": "Summer collection special discount"
+    },
+    {
+      "id": 1767111781323,
+      "code": "WELCOME10",
+      "discount": "10% OFF",
+      "description": "Welcome offer for new customers"
+    },
+    {
+      "id": 1767111781324,
+      "code": "VIP50",
+      "discount": "50% OFF",
+      "description": "Exclusive offer for VIP customers"
+    },
+    {
+      "id": 1767111781325,
+      "code": "FLASH30",
+      "discount": "30% OFF",
+      "description": "Limited 24-hour flash sale"
+    },
+    {
+      "id": 1767111781326,
+      "code": "FESTIVE20",
+      "discount": "20% OFF",
+      "description": "Festive season special pricing"
+    },
+    {
+      "id": 1767111781327,
+      "code": "CLEARANCE40",
+      "discount": "40% OFF",
+      "description": "End of season clearance sale"
+    },
+    {
+      "id": 1767111781328,
+      "code": "WEEKEND15",
+      "discount": "15% OFF",
+      "description": "Weekend special discount"
+    },
+    {
+      "id": 1767111781329,
+      "code": "LOYALTY25",
+      "discount": "25% OFF",
+      "description": "Loyal customer appreciation offer"
+    },
+    {
+      "id": 1767111781330,
+      "code": "STYLE30",
+      "discount": "30% OFF",
+      "description": "Selected fashion styles offer"
+    },
+    {
+      "id": 1767111781331,
+      "code": "LASTCALL35",
+      "discount": "35% OFF",
+      "description": "Last chance closing sale"
+    }
+  ],
+  "template": "Hi {{1}} 👋\n\n✨ *Exclusive Offer Just for You!* ✨\n\n{{2}}\n\n⏰ *Offer Valid Until:* {{3}}\n\nVisit our store and grab your favorite styles before time runs out.\nCome and get it soon! 🛍️🔥\n\n",
+  "settings": {
+    "customerCareNumber": "+91 6369825386",
+    "sendToCustomerCare": true,
+    "sendToCarePerCustomer": false,
+    "platform": "both"
+  }
+}

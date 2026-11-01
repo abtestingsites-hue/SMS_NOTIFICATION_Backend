@@ -1,0 +1,33 @@
+{
+  "suppressionList": [
+    {
+      "phone": "+19998887777",
+      "reason": "Customer Inbound Opt-Out (STOP)",
+      "source": "TWILIO_INBOUND_WEBHOOK",
+      "addedAt": "2026-11-01T05:31:03.354Z",
+      "updatedAt": "2026-11-01T08:20:51.202Z"
+    },
+    {
+      "phone": "+15005550009",
+      "reason": "User Opt-Out (STOP)",
+      "source": "INBOUND_SMS",
+      "addedAt": "2026-10-29T04:38:38.282Z"
+    }
+  ],
+  "rules": {
+    "quietHoursEnabled": true,
+    "quietHoursStart": "21:00",
+    "quietHoursEnd": "08:00",
+    "timezone": "Asia/Kolkata",
+    "frequencyCapEnabled": true,
+    "maxMessagesPerWeek": 3,
+    "optOutKeywords": [
+      "STOP",
+      "UNSUBSCRIBE",
+      "CANCEL",
+      "QUIT",
+      "END",
+      "OPTOUT"
+    ]
+  }
+}
